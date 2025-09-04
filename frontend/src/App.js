@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import SplashPage from './pages/SplashPage';
@@ -9,7 +10,7 @@ import './styles/main.css';
 import './styles/utils.css';
 
 const App = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // Set to true for testing
+    const [isAuthenticated, setIsAuthenticated] = useState(false); 
     const [currentUser, setCurrentUser] = useState(null);
 
     const handleLogin = (userData) => {
@@ -22,7 +23,6 @@ const App = () => {
         setCurrentUser(null);
     };
 
-    // Wrapper for ProfilePage to ensure rerender on param change
     const ProfileWrapper = ({ currentUser, onLogout }) => {
         const { id } = useParams();
         return (

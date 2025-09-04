@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 import LoginForm from '../components/LoginForm';
 import SignUpForm from '../components/SignUpForm';
@@ -10,9 +11,7 @@ const SplashPage = ({ onLogin }) => {
     return (
         <div className="splash-container">
             <div className="splash-content">
-                {/* Hero content */}
                 <div className="splash-hero">
-                    {/* Title with Logo */}
                     <div className="splash-title">
                         <img 
                             src={LogoImage} 
@@ -48,7 +47,6 @@ const SplashPage = ({ onLogin }) => {
                     </div>
                 </div>
 
-                {/* Auth forms */}
                 <div className="auth-container">
                     <div className="auth-header">
                         <h3>Enter the Forge</h3>

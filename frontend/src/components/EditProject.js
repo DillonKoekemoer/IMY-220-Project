@@ -1,7 +1,7 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 
 const EditProject = ({ projectId, onClose, onSave }) => {
-    // Get existing project data (dummy data for now)
     const existingProject = {
         name: "Steel Web Framework",
         description: "A robust web framework forged in the fires of modern development",
@@ -67,7 +67,6 @@ const EditProject = ({ projectId, onClose, onSave }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         
-        // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -76,13 +75,11 @@ const EditProject = ({ projectId, onClose, onSave }) => {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Validate file size (5MB limit as per spec)
             if (file.size > 5 * 1024 * 1024) {
                 setErrors(prev => ({ ...prev, image: 'Image must be smaller than 5MB' }));
                 return;
             }
             
-            // For now, just log the file - in a real app you'd upload it
             console.log('Image selected:', file.name);
             setErrors(prev => ({ ...prev, image: '' }));
         }

@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 
 const EditProfile = ({ user, onClose, onSave }) => {
@@ -12,11 +13,9 @@ const EditProfile = ({ user, onClose, onSave }) => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Validation rules
     const validateForm = () => {
         const newErrors = {};
 
-        // First name validation
         if (!formData.firstName.trim()) {
             newErrors.firstName = 'First name is required';
         } else if (formData.firstName.trim().length < 2) {
@@ -25,7 +24,6 @@ const EditProfile = ({ user, onClose, onSave }) => {
             newErrors.firstName = 'First name must be less than 50 characters';
         }
 
-        // Last name validation
         if (!formData.lastName.trim()) {
             newErrors.lastName = 'Last name is required';
         } else if (formData.lastName.trim().length < 2) {
@@ -34,12 +32,10 @@ const EditProfile = ({ user, onClose, onSave }) => {
             newErrors.lastName = 'Last name must be less than 50 characters';
         }
 
-        // Bio validation
         if (formData.bio.length > 500) {
             newErrors.bio = 'Bio must be less than 500 characters';
         }
 
-        // Website validation
         if (formData.website && formData.website.trim()) {
             const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
             if (!urlPattern.test(formData.website)) {
@@ -47,7 +43,6 @@ const EditProfile = ({ user, onClose, onSave }) => {
             }
         }
 
-        // Location validation
         if (formData.location.length > 100) {
             newErrors.location = 'Location must be less than 100 characters';
         }
@@ -61,7 +56,6 @@ const EditProfile = ({ user, onClose, onSave }) => {
         setIsSubmitting(true);
 
         if (validateForm()) {
-            // Simulate API call delay
             setTimeout(() => {
                 onSave(formData);
                 setIsSubmitting(false);
@@ -75,7 +69,6 @@ const EditProfile = ({ user, onClose, onSave }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         
-        // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }

@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -18,7 +19,6 @@ const ProjectPreview = ({ project }) => {
 
   return (
     <article className="project-preview-card">
-      {/* Project Header */}
       <div className="project-header">
         <div className="project-title-section">
           <h3 className="project-title">
@@ -40,7 +40,6 @@ const ProjectPreview = ({ project }) => {
         </div>
       </div>
 
-      {/* Project Content */}
       <div className="project-content">
         <p className="project-description">
           {project.description}
@@ -76,7 +75,6 @@ const ProjectPreview = ({ project }) => {
         )}
       </div>
 
-      {/* Project Footer */}
       <div className="project-footer">
         
         <div className="project-stats">

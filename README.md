@@ -16,3 +16,20 @@ Deliverable 1
     - I have created the project baed on the specs provided, making use of 4 main pages and many components that follow.
     - I have also done a significant amount of css so that one can see what it might look like for the next deliverable 
 
+How to run project
+
+# locally #
+
+1. npm install
+2. npm start
+3. http://localhost:3000
+
+# Docker Commands #
+1. build it
+    docker build -t codeforge.
+
+2. Run the container
+    docker run --rm -p 3000:3000 codeforge
+
+3. http://localhost:3000
+

@@ -1,4 +1,4 @@
-// Updated CreateProject.js (with isModal prop support)
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 
 const CreateProject = ({ onClose, onSave, isModal = true }) => {
@@ -23,7 +23,6 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
         'Game'
     ];
 
-    // Validation rules
     const validateForm = () => {
         const newErrors = {};
 
@@ -78,7 +77,6 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
         setIsSubmitting(true);
 
         if (validateForm()) {
-            // Process languages into array
             const processedData = {
                 ...formData,
                 languages: formData.languages
@@ -87,7 +85,6 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
                     .filter(lang => lang.length > 0)
             };
 
-            // Simulate API call delay
             setTimeout(() => {
                 onSave(processedData);
                 setIsSubmitting(false);
@@ -101,7 +98,6 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         
-        // Clear error for this field when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }

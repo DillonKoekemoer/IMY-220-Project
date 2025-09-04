@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 
 const SignUpForm = ({ onSignUp }) => {
@@ -15,28 +16,24 @@ const SignUpForm = ({ onSignUp }) => {
     const validateForm = () => {
         const newErrors = {};
         
-        // Email 
         if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email address';
         }
         
-        // First name 
         if (!formData.firstName.trim()) {
             newErrors.firstName = 'First name is required';
         } else if (formData.firstName.length < 2) {
             newErrors.firstName = 'First name must be at least 2 characters';
         }
         
-        // Last name 
         if (!formData.lastName.trim()) {
             newErrors.lastName = 'Last name is required';
         } else if (formData.lastName.length < 2) {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
         
-        // Username 
         if (!formData.username.trim()) {
             newErrors.username = 'Username is required';
         } else if (formData.username.length < 3) {
@@ -45,7 +42,6 @@ const SignUpForm = ({ onSignUp }) => {
             newErrors.username = 'Username can only contain letters, numbers, and underscores';
         }
         
-        // Password 
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 8) {
@@ -54,7 +50,6 @@ const SignUpForm = ({ onSignUp }) => {
             newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
         }
         
-        // Confirm password 
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = 'Please confirm your password';
         } else if (formData.password !== formData.confirmPassword) {

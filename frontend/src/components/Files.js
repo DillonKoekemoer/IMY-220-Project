@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 
 const Files = ({ projectId }) => {
@@ -15,10 +16,8 @@ const Files = ({ projectId }) => {
         { id: 8, name: "blueprint.png", size: "156 KB", type: "Image", lastModified: "2025-08-25", icon: "🖼️" }
     ];
 
-    // Get unique file types for filter
     const fileTypes = ['all', ...new Set(dummyFiles.map(file => file.type))];
 
-    // Filter and sort files
     const processedFiles = dummyFiles
         .filter(file => filterType === 'all' || file.type === filterType)
         .sort((a, b) => {
@@ -38,12 +37,10 @@ const Files = ({ projectId }) => {
 
     const handleDownload = (file) => {
         console.log(`Downloading ${file.name}...`);
-        // In a real app, this would trigger the actual download
     };
 
     const handleView = (file) => {
         console.log(`Viewing ${file.name}...`);
-        // In a real app, this would open file viewer/editor
     };
 
     const getTotalSize = () => {

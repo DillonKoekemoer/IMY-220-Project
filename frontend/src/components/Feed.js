@@ -1,8 +1,9 @@
+// Dillon Koekemoer u23537052
 import React from 'react';
 import ProjectPreview from './ProjectPreview';
 
 const Feed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }) => {
-    // Dummy data with type property
+    // Dummy data 
     const dummyProjects = [
         {
             id: 1,
@@ -72,10 +73,8 @@ const Feed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }) => {
         },
     ];
 
-    // Filter projects by feed type, search term, and language
     let filteredProjects = dummyProjects.filter(project => project.type === type);
 
-    // Apply search filter
     if (searchTerm) {
         filteredProjects = filteredProjects.filter(project =>
             project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -83,19 +82,17 @@ const Feed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }) => {
         );
     }
 
-    // Apply language filter
     if (selectedLanguage !== 'all') {
         filteredProjects = filteredProjects.filter(project =>
             project.languages.includes(selectedLanguage)
         );
     }
 
-    // Sort projects
     filteredProjects.sort((a, b) => {
         if (sortBy === 'name') {
             return a.name.localeCompare(b.name);
         } else if (sortBy === 'version') {
-            return b.version.localeCompare(a.version); // Reverse for newer versions first
+            return b.version.localeCompare(a.version); 
         } else if (sortBy === 'status') {
             return a.status.localeCompare(b.status);
         }

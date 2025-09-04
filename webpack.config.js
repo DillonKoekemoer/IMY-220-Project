@@ -1,3 +1,4 @@
+// Dillon Koekemoer u23537052
 const path = require('path');
 module.exports = {
     entry: './frontend/src/index.js',
