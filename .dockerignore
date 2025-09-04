@@ -1,0 +1,40 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Build artifacts
+public/
+frontend/public/bundle.js
+frontend/public/assets/
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# MongoDB
+data/
+mongodb_data/
+
+# Editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# Logs
+logs/
+*.log

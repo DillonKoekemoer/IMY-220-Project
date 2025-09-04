@@ -1,0 +1,103 @@
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import SplashPage from './pages/SplashPage';
+import HomePage from './pages/HomePage';
+import ProfilePage from './pages/ProfilePage';
+import ProjectPage from './pages/ProjectPage';
+import Header from './components/Header';
+import './styles/main.css';
+import './styles/utils.css';
+
+const App = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // Set to true for testing
+    const [currentUser, setCurrentUser] = useState(null);
+
+    const handleLogin = (userData) => {
+        setIsAuthenticated(true);
+        setCurrentUser(userData);
+    };
+
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+    };
+
+    // Wrapper for ProfilePage to ensure rerender on param change
+    const ProfileWrapper = ({ currentUser, onLogout }) => {
+        const { id } = useParams();
+        return (
+            <>
+                <Header currentUser={currentUser} onLogout={onLogout} />
+                <ProfilePage 
+                    key={id} 
+                    currentUser={currentUser} 
+                    onLogout={onLogout} 
+                />
+            </>
+        );
+    };
+
+    return (
+        <div className="app">
+            <Routes>
+                <Route 
+                    path="/" 
+                    element={
+                        isAuthenticated ? 
+                        <Navigate to="/home" replace /> : 
+                        <SplashPage onLogin={handleLogin} />
+                    } 
+                />
+
+                <Route
+                    path=""
+                    element={<SplashPage onLogin={handleLogin} />}
+                />
+
+                <Route 
+                    path="/home" 
+                    element={
+                        isAuthenticated ? (
+                            <>
+                                <Header currentUser={currentUser} onLogout={handleLogout} />
+                                <HomePage currentUser={currentUser} />
+                            </>
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    } 
+                />
+
+                <Route 
+                    path="/profile/:id" 
+                    element={
+                        isAuthenticated ? (
+                            <ProfileWrapper 
+                                currentUser={currentUser} 
+                                onLogout={handleLogout} 
+                            />
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    } 
+                />
+
+                <Route 
+                    path="/project/:id" 
+                    element={
+                        isAuthenticated ? (
+                            <>
+                                <Header currentUser={currentUser} onLogout={handleLogout} />
+                                <ProjectPage currentUser={currentUser} />
+                            </>
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    } 
+                />
+            </Routes>
+        </div>
+    );
+};
+
+export default App;

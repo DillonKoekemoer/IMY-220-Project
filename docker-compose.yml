@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  codeforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: codeforge:latest
+    container_name: codeforge
+    ports:
+      - "3000:3000" # Frontend
+      - "5000:5000" # Backend
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/version_control_db
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
