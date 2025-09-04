@@ -33,3 +33,4 @@ How to run project
 
 3. http://localhost:3000
 
+link to github - https://github.com/DillonKoekemoer/IMY-220-Project
