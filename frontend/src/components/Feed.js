@@ -88,8 +88,12 @@ const Feed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }) => {
 
     const handleItemClick = (item) => {
         if (item.content) {
-            // Navigate to post detail
-            navigate(`/post/${item._id}`);
+            // This is a post - navigate to post detail or project if it has projectId
+            if (item.projectId) {
+                navigate(`/project/${item.projectId}`);
+            } else {
+                navigate(`/post/${item._id}`);
+            }
         } else if (item.projectId) {
             // Navigate to project detail
             navigate(`/project/${item.projectId}`);

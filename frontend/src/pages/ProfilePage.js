@@ -7,6 +7,7 @@ import EditProfile from '../components/EditProfile';
 import ProjectList from '../components/ProjectList';
 import FriendsList from '../components/FriendsList';
 import CreateProject from '../components/CreateProject';
+import UserActivity from '../components/UserActivity';
 import '../styles/profilepage.css';
 
 const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
@@ -125,38 +126,14 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                             <CreateProject 
                                 onSave={handleProjectSave}
                                 isModal={false}
+                                currentUser={currentUser}
                             />
                         </div>
                     )}
                     
                     {activeTab === 'activity' && isOwnProfile && (
                         <div className="activity-section">
-                            <div className="card">
-                                <h3>Recent Activity</h3>
-                                <div className="activity-list">
-                                    <div className="activity-item">
-                                        <div className="activity-icon">📝</div>
-                                        <div className="activity-content">
-                                            <p><strong>Project Updated:</strong> Updated README.md in "CodeForge Project"</p>
-                                            <span className="activity-time">2 hours ago</span>
-                                        </div>
-                                    </div>
-                                    <div className="activity-item">
-                                        <div className="activity-icon">🚀</div>
-                                        <div className="activity-content">
-                                            <p><strong>New Project:</strong> Created "React Dashboard"</p>
-                                            <span className="activity-time">1 day ago</span>
-                                        </div>
-                                    </div>
-                                    <div className="activity-item">
-                                        <div className="activity-icon">👥</div>
-                                        <div className="activity-content">
-                                            <p><strong>New Friend:</strong> Connected with Jane Smith</p>
-                                            <span className="activity-time">3 days ago</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <UserActivity userId={id} />
                         </div>
                     )}
                 </div>

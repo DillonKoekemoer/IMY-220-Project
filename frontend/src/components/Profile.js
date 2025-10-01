@@ -111,10 +111,10 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                 <div className="profile-info-section">
                     <h1 className="profile-name">{profileData.name || `${profileData.firstName} ${profileData.lastName}`}</h1>
                     <p className="profile-username">@{profileData.username}</p>
-                    <p className="profile-bio">{profileData.bio}</p>
+                    {profileData.bio && <p className="profile-bio">{profileData.bio}</p>}
                     <div className="profile-meta">
-                        <span className="meta-item">📍 {profileData.location}</span>
-                        <span className="meta-item">📅 {profileData.joinDate}</span>
+                        {profileData.location && <span className="meta-item">📍 {profileData.location}</span>}
+                        <span className="meta-item">📅 {profileData.joinDate || 'Recently joined'}</span>
                     </div>
                     {profileData.website && (
                         <div className="profile-website">

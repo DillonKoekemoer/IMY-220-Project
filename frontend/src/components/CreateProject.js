@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { postsAPI } from '../services/api';
 
-const CreateProject = ({ onClose, onSave, isModal = true }) => {
+const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -79,7 +79,6 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
 
         if (validateForm()) {
             try {
-                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
                 const processedData = {
                     ...formData,
                     languages: formData.languages
@@ -88,10 +87,22 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
                         .filter(lang => lang.length > 0),
                     createdAt: new Date().toISOString(),
                     status: 'active',
-                    userId: currentUser._id || currentUser.id
+                    userId: currentUser?._id
                 };
 
-                const result = await postsAPI.create(processedData);
+                const response = await fetch('http://localhost:3001/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(processedData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create project');
+                }
+                
+                const result = await response.json();
                 onSave(result);
             } catch (error) {
                 console.error('Create project error:', error);

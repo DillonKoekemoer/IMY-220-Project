@@ -74,8 +74,9 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         
-        const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, user: { _id: user._id, name: user.name, email: user.email } });
+        const userId = user._id.toString ? user._id.toString() : user._id;
+        const token = jwt.sign({ userId, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
+        res.json({ token, user: { _id: userId, name: user.name, email: user.email } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: error.message });
@@ -92,10 +93,23 @@ app.post('/api/register', async (req, res) => {
         if (existingUser) return res.status(400).json({ error: 'User already exists' });
         
         const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await db.collection('Users').insertOne({ name, email, password: hashedPassword });
+        const [firstName, lastName] = name.split(' ');
+        const userData = {
+            name,
+            email,
+            password: hashedPassword,
+            firstName: firstName || name,
+            lastName: lastName || '',
+            bio: '',
+            location: '',
+            website: ''
+        };
+        const result = await db.collection('Users').insertOne(userData);
+        const userId = result.insertedId.toString();
+        console.log('New user created with ID:', userId);
         
-        const token = jwt.sign({ userId: result.insertedId, email }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ token, user: { _id: result.insertedId, name, email } });
+        const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '24h' });
+        res.status(201).json({ token, user: { _id: userId, name, email } });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -149,12 +163,18 @@ app.get('/api/users/:id', async (req, res) => {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
         console.log('Fetching user with ID:', req.params.id);
         
-        // Check if ID is valid ObjectId format
-        if (!ObjectId.isValid(req.params.id)) {
-            return res.status(400).json({ error: 'Invalid user ID format' });
+        let user;
+        
+        // Try to find user with ObjectId format first
+        if (ObjectId.isValid(req.params.id)) {
+            user = await db.collection('Users').findOne({ _id: new ObjectId(req.params.id) });
         }
         
-        const user = await db.collection('Users').findOne({ _id: new ObjectId(req.params.id) });
+        // If not found and ID is string format, try string lookup
+        if (!user) {
+            user = await db.collection('Users').findOne({ _id: req.params.id });
+        }
+        
         console.log('User found:', user);
         if (!user) return res.status(404).json({ error: 'User not found' });
         res.json(user);
@@ -240,6 +260,20 @@ app.get('/api/posts', async (req, res) => {
     }
 });
 
+app.get('/api/posts/project/:projectId', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        const posts = await db.collection('Posts')
+            .find({ projectId: req.params.projectId })
+            .sort({ createdAt: -1 })
+            .toArray();
+        res.json(posts);
+    } catch (error) {
+        console.error('Project posts fetch error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get('/api/posts/:id', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
@@ -289,7 +323,126 @@ app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Feed endpoints
+// Projects API endpoints
+app.get('/api/projects', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        const projects = await db.collection('Projects').find({}).toArray();
+        res.json(projects);
+    } catch (error) {
+        console.error('Projects fetch error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/projects/:id', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        if (!ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        
+        const project = await db.collection('Projects').findOne({ _id: new ObjectId(req.params.id) });
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+        res.json(project);
+    } catch (error) {
+        console.error('Project fetch error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/projects', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        const result = await db.collection('Projects').insertOne(req.body);
+        res.status(201).json({ _id: result.insertedId, ...req.body });
+    } catch (error) {
+        console.error('Project create error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put('/api/projects/:id', authenticateToken, async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        if (!ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        
+        const result = await db.collection('Projects').updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: req.body }
+        );
+        if (result.matchedCount === 0) return res.status(404).json({ error: 'Project not found' });
+        res.json({ message: 'Project updated' });
+    } catch (error) {
+        console.error('Project update error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        if (!ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid project ID format' });
+        }
+        
+        const result = await db.collection('Projects').deleteOne({ _id: new ObjectId(req.params.id) });
+        if (result.deletedCount === 0) return res.status(404).json({ error: 'Project not found' });
+        res.json({ message: 'Project deleted' });
+    } catch (error) {
+        console.error('Project delete error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Feed endpoints - Projects for main feed
+app.get('/api/feed/projects/global', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const projects = await db.collection('Projects')
+            .find({})
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .toArray();
+            
+        res.json(projects);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/feed/projects/local/:userId', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const userId = req.params.userId;
+        
+        // Get user's friends
+        const friends = await db.collection('Friends')
+            .find({ userId, status: 'accepted' })
+            .toArray();
+        const friendIds = friends.map(f => f.friendId);
+        friendIds.push(userId); // Include user's own projects
+        
+        const projects = await db.collection('Projects')
+            .find({ userId: { $in: friendIds } })
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .toArray();
+            
+        res.json(projects);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Activity feed endpoints - Posts for sidebar
 app.get('/api/feed/global', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
@@ -367,34 +520,7 @@ app.get('/api/friends/:userId', async (req, res) => {
     }
 });
 
-app.post('/api/users/add-friend', async (req, res) => {
-    try {
-        if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
-        const { userId, friendId } = req.body;
-        
-        // Check if friendship already exists
-        const existingFriend = await db.collection('Friends')
-            .findOne({ userId, friendId });
-            
-        if (existingFriend) {
-            return res.status(400).json({ error: 'Already friends' });
-        }
-        
-        // Add friend relationship
-        const result = await db.collection('Friends').insertOne({
-            userId,
-            friendId,
-            status: 'accepted',
-            createdAt: new Date().toISOString()
-        });
-        
-        res.status(201).json({ message: 'Friend added successfully', _id: result.insertedId });
-    } catch (error) {
-        console.error('Add friend error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
+
 
 // Catch-all handler: send back React's index.html for any unknown route
 app.get('/*', (req, res) => {

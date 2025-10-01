@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 
 const ProjectPreview = ({ project }) => {
   const getStatusIcon = (status) => {
-    return status === 'checked-in' ? '✅' : '🛠️';
+    return status === 'active' ? '✅' : '🛠️';
   };
 
   const getStatusText = (status) => {
-    return status === 'checked-in' ? 'Completed' : 'In Progress';
+    return status === 'active' ? 'Active' : 'Inactive';
   };
 
   const formatLanguages = (languages) => {
@@ -23,7 +23,7 @@ const ProjectPreview = ({ project }) => {
         <div className="project-title-section">
           <h3 className="project-title">
             <Link to={`/project/${project._id}`} className="project-link">
-              {project.title}
+              {project.name}
             </Link>
           </h3>
           <div className="project-status">
@@ -47,26 +47,26 @@ const ProjectPreview = ({ project }) => {
         
         <div className="project-meta">
           <div className="meta-row">
-            <span className="meta-label">Author:</span>
-            <span className="meta-value">{project.author}</span>
+            <span className="meta-label">Type:</span>
+            <span className="meta-value">{project.type}</span>
           </div>
           <div className="meta-row">
-            <span className="meta-label">Language:</span>
-            <span className="meta-value">{project.language}</span>
+            <span className="meta-label">Languages:</span>
+            <span className="meta-value">{Array.isArray(project.languages) ? project.languages.join(', ') : project.languages}</span>
           </div>
           <div className="meta-row">
-            <span className="meta-label">Date:</span>
+            <span className="meta-label">Created:</span>
             <span className="meta-value">
               {new Date(project.createdAt).toLocaleDateString()}
             </span>
           </div>
         </div>
 
-        {project.hashtags && project.hashtags.length > 0 && (
+        {project.languages && project.languages.length > 0 && (
           <div className="project-languages">
-            {project.hashtags.map((tag, index) => (
+            {(Array.isArray(project.languages) ? project.languages : [project.languages]).map((lang, index) => (
               <span key={index} className="language-tag">
-                #{tag}
+                {lang}
               </span>
             ))}
           </div>
@@ -74,22 +74,11 @@ const ProjectPreview = ({ project }) => {
       </div>
 
       <div className="project-footer">
-        
-        <div className="project-stats">
-          <span className="stat-item">
-            <span className="stat-icon" aria-hidden="true">📁</span>
-            <span>{project.fileCount || 12} files</span>
-          </span>
-          <span className="stat-item">
-            <span className="stat-icon" aria-hidden="true">⬇️</span>
-            <span>{project.downloads || 45} downloads</span>
-          </span>
-        </div>
-       < div className="project-actions">
+        <div className="project-actions">
           <Link 
             to={`/project/${project._id}`} 
             className="btn btn-sm btn-primary"
-            aria-label={`View details for ${project.title}`}
+            aria-label={`View details for ${project.name}`}
           >
             <span aria-hidden="true">📋</span>
             View Details

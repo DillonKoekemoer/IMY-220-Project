@@ -14,8 +14,9 @@ const App = () => {
     const [currentUser, setCurrentUser] = useState(null);
 
     const handleLogin = (userData) => {
+        console.log('Login data received:', userData);
         setIsAuthenticated(true);
-        setCurrentUser(userData);
+        setCurrentUser(userData.user || userData);
     };
 
     const handleLogout = () => {

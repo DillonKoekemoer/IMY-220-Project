@@ -13,7 +13,7 @@ const Project = ({ projectId, currentUser, onEdit }) => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/posts/${projectId}`);
+        const response = await fetch(`http://localhost:3001/api/projects/${projectId}`);
         if (!response.ok) {
           throw new Error('Project not found');
         }
@@ -45,15 +45,15 @@ const Project = ({ projectId, currentUser, onEdit }) => {
   if (error) return <div className="card">Error: {error}</div>;
   if (!project) return <div className="card">Project not found</div>;
 
-  const isOwner = currentUser?.name === project.author;
+  const isOwner = currentUser?._id === project.userId;
 
   return (
     <div className="card mb-2">
       <div className="project-header">
-        <h2>{project.title}</h2>
+        <h2>{project.name}</h2>
         <div className="project-status">
           <span className="status">
-            Active
+            {project.status || 'Active'}
           </span>
         </div>
       </div>
@@ -70,21 +70,20 @@ const Project = ({ projectId, currentUser, onEdit }) => {
                 textDecoration: projectAuthor?._id ? 'underline' : 'none'
               }}
             >
-              {projectAuthor?.name || project.author}
+              {projectAuthor?.name || 'Loading...'}
             </span>
           </p>
-          <p><strong>Language: </strong> {project.language}</p>
-          <p><strong>Date: </strong> {new Date(project.createdAt).toLocaleDateString()}</p>
-          {project.hashtags && (
-            <p><strong>Tags: </strong> {project.hashtags.map(tag => `#${tag}`).join(' ')}</p>
-          )}
+          <p><strong>Type: </strong> {project.type}</p>
+          <p><strong>Version: </strong> {project.version}</p>
+          <p><strong>Languages: </strong> {Array.isArray(project.languages) ? project.languages.join(', ') : project.languages}</p>
+          <p><strong>Created: </strong> {new Date(project.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
 
       <div className="project-actions">
         {isOwner && (
           <button className="btn btn-secondary" onClick={onEdit}>
-            Edit Blueprint
+            Edit Project
           </button>
         )}
         {projectAuthor?._id && (

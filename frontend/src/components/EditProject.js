@@ -1,17 +1,40 @@
 // Dillon Koekemoer u23537052
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { projectsAPI } from '../services/api';
 
 const EditProject = ({ projectId, onClose, onSave }) => {
-    const existingProject = {
-        name: "Steel Web Framework",
-        description: "A robust web framework forged in the fires of modern development",
-        type: "Web Application",
-        languages: "JavaScript, React, Node.js",
-        version: "v2.1.0"
-    };
-
-    const [formData, setFormData] = useState(existingProject);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        type: '',
+        languages: '',
+        version: ''
+    });
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProject = async () => {
+            try {
+                const project = await projectsAPI.getById(projectId);
+                setFormData({
+                    name: project.name || '',
+                    description: project.description || '',
+                    type: project.type || '',
+                    languages: Array.isArray(project.languages) ? project.languages.join(', ') : project.languages || '',
+                    version: project.version || ''
+                });
+            } catch (error) {
+                console.error('Failed to fetch project:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (projectId) {
+            fetchProject();
+        }
+    }, [projectId]);
 
     const projectTypes = [
         'Web Application',
@@ -55,11 +78,20 @@ const EditProject = ({ projectId, onClose, onSave }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
-            console.log('Saving project with data:', formData);
-            onSave(formData);
+            try {
+                const updateData = {
+                    ...formData,
+                    languages: formData.languages.split(',').map(lang => lang.trim()).filter(lang => lang)
+                };
+                await projectsAPI.update(projectId, updateData);
+                onSave(updateData);
+            } catch (error) {
+                console.error('Failed to update project:', error);
+                setErrors({ submit: 'Failed to update project' });
+            }
         }
     };
 
@@ -85,18 +117,32 @@ const EditProject = ({ projectId, onClose, onSave }) => {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="modal-overlay">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h3>Loading...</h3>
+                        <button className="modal-close" onClick={onClose}>×</button>
+                    </div>
+                    <div className="loading">Loading project data...</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <div className="modal-header">
-                    <h3>Reforge Blueprint</h3>
+                    <h3>Reforge Project</h3>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
                 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="projectName" className="form-label">
-                            Blueprint Name *
+                            Project Name *
                         </label>
                         <input
                             type="text"
@@ -112,7 +158,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
 
                     <div className="form-group">
                         <label htmlFor="description" className="form-label">
-                            Blueprint Description *
+                            Description *
                         </label>
                         <textarea
                             id="description"
@@ -183,7 +229,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
 
                     <div className="form-group">
                         <label htmlFor="projectImage" className="form-label">
-                            Blueprint Image
+                            Project Image
                         </label>
                         <input
                             type="file"
@@ -197,6 +243,8 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                             Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP
                         </small>
                     </div>
+
+                    {errors.submit && <div className="error-message">{errors.submit}</div>}
 
                     <div className="form-actions">
                         <button type="submit" className="btn btn-primary">
