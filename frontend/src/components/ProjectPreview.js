@@ -18,54 +18,42 @@ const ProjectPreview = ({ project }) => {
   };
 
   return (
-    <article className="project-preview-card">
-      <div className="project-header">
-        <div className="project-title-section">
-          <h3 className="project-title">
-            <Link to={`/project/${project._id}`} className="project-link">
+    <article className="bg-iron-light text-silver rounded-xl shadow-forge p-6 border-2 border-steel-blue transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-2 hover:border-forge-orange hover:bg-iron-gray animate-fade-in-up h-full flex flex-col">
+      <div className="mb-6">
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-forge-yellow hover:text-forge-orange transition-colors leading-tight">
+            <Link to={`/project/${project._id}`}>
               {project.name}
             </Link>
           </h3>
-          <div className="project-status">
-            <div className={`status-badge ${project.status}`}>
-              <span className="status-icon" aria-hidden="true">
-                {getStatusIcon(project.status)}
-              </span>
-              <span>{getStatusText(project.status)}</span>
-            </div>
-            <div className="project-version">
-              Version {project.version}
-            </div>
-          </div>
+        </div>
+        <div className="text-sm text-forge-orange font-medium mb-4">
+          Version {project.version}
         </div>
       </div>
 
-      <div className="project-content">
-        <p className="project-description">
+      <div className="flex-1 space-y-4">
+        <p className="text-ash-gray text-sm leading-relaxed">
           {project.description}
         </p>
         
-        <div className="project-meta">
-          <div className="meta-row">
-            <span className="meta-label">Type:</span>
-            <span className="meta-value">{project.type}</span>
+        <div className="bg-iron-gray/50 rounded-lg p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-silver font-semibold text-sm">Type:</span>
+            <span className="text-forge-yellow text-sm font-medium">{project.type}</span>
           </div>
-          <div className="meta-row">
-            <span className="meta-label">Languages:</span>
-            <span className="meta-value">{Array.isArray(project.languages) ? project.languages.join(', ') : project.languages}</span>
-          </div>
-          <div className="meta-row">
-            <span className="meta-label">Created:</span>
-            <span className="meta-value">
+          <div className="flex justify-between items-center">
+            <span className="text-silver font-semibold text-sm">Created:</span>
+            <span className="text-ash-gray text-sm">
               {new Date(project.createdAt).toLocaleDateString()}
             </span>
           </div>
         </div>
 
         {project.languages && project.languages.length > 0 && (
-          <div className="project-languages">
+          <div className="flex flex-wrap gap-2">
             {(Array.isArray(project.languages) ? project.languages : [project.languages]).map((lang, index) => (
-              <span key={index} className="language-tag">
+              <span key={index} className="bg-forge-orange/20 text-forge-orange px-3 py-1 rounded-full text-xs font-semibold border border-forge-orange/30 transition-all duration-300 hover:bg-forge-orange hover:text-white hover:scale-105">
                 {lang}
               </span>
             ))}
@@ -73,17 +61,15 @@ const ProjectPreview = ({ project }) => {
         )}
       </div>
 
-      <div className="project-footer">
-        <div className="project-actions">
-          <Link 
-            to={`/project/${project._id}`} 
-            className="btn btn-sm btn-primary"
-            aria-label={`View details for ${project.name}`}
-          >
-            <span aria-hidden="true">📋</span>
-            View Details
-          </Link>
-        </div>
+      <div className="mt-6 pt-4 border-t border-ash-gray/20">
+        <Link 
+          to={`/project/${project._id}`} 
+          className="w-full px-6 py-3 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+          aria-label={`View details for ${project.name}`}
+        >
+          <span aria-hidden="true">🚀</span>
+          View Project
+        </Link>
       </div>
     </article>
   );

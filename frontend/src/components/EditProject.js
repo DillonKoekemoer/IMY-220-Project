@@ -119,30 +119,30 @@ const EditProject = ({ projectId, onClose, onSave }) => {
 
     if (loading) {
         return (
-            <div className="modal-overlay">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h3>Loading...</h3>
-                        <button className="modal-close" onClick={onClose}>×</button>
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg p-4">
+                <div className="bg-iron-gray text-silver rounded-xl p-8 max-w-md w-full shadow-forge-hover border-2 border-forge-orange">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-semibold text-forge-yellow">Loading...</h3>
+                        <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                     </div>
-                    <div className="loading">Loading project data...</div>
+                    <div className="text-center text-ash-gray">Loading project data...</div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h3>Reforge Project</h3>
-                    <button className="modal-close" onClick={onClose}>×</button>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg p-4">
+            <div className="bg-iron-gray text-silver rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-forge-hover border-2 border-forge-orange">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-semibold text-forge-yellow">⚒️ Reforge Project</h3>
+                    <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                 </div>
                 
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="projectName" className="form-label">
-                            Project Name *
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                        <label htmlFor="projectName" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                            Project Name <span className="text-forge-red">*</span>
                         </label>
                         <input
                             type="text"
@@ -150,51 +150,63 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className={`form-input ${errors.name ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                                errors.name 
+                                    ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                    : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                            } focus:outline-none placeholder-ash-gray`}
                             placeholder="Enter your project's forge name"
                         />
-                        {errors.name && <span className="error-message">{errors.name}</span>}
+                        {errors.name && <div className="text-forge-red font-medium text-sm mt-1">{errors.name}</div>}
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="description" className="form-label">
-                            Description *
+                    <div>
+                        <label htmlFor="description" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                            Description <span className="text-forge-red">*</span>
                         </label>
                         <textarea
                             id="description"
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            className={`form-input ${errors.description ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 resize-none ${
+                                errors.description 
+                                    ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                    : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                            } focus:outline-none placeholder-ash-gray`}
                             rows="4"
                             placeholder="Describe what you're forging in this project"
                         />
-                        {errors.description && <span className="error-message">{errors.description}</span>}
+                        {errors.description && <div className="text-forge-red font-medium text-sm mt-1">{errors.description}</div>}
                     </div>
 
-                    <div className="grid grid-2">
-                        <div className="form-group">
-                            <label htmlFor="type" className="form-label">
-                                Forge Type *
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="type" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                                Forge Type <span className="text-forge-red">*</span>
                             </label>
                             <select
                                 id="type"
                                 name="type"
                                 value={formData.type}
                                 onChange={handleChange}
-                                className={`form-input ${errors.type ? 'error' : ''}`}
+                                className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] cursor-pointer ${
+                                    errors.type 
+                                        ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                        : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                                } focus:outline-none`}
                             >
                                 <option value="">Select forge type...</option>
                                 {projectTypes.map(type => (
                                     <option key={type} value={type}>{type}</option>
                                 ))}
                             </select>
-                            {errors.type && <span className="error-message">{errors.type}</span>}
+                            {errors.type && <div className="text-forge-red font-medium text-sm mt-1">{errors.type}</div>}
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="version" className="form-label">
-                                Version *
+                        <div>
+                            <label htmlFor="version" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                                Version <span className="text-forge-red">*</span>
                             </label>
                             <input
                                 type="text"
@@ -202,15 +214,19 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                                 name="version"
                                 value={formData.version}
                                 onChange={handleChange}
-                                className={`form-input ${errors.version ? 'error' : ''}`}
+                                className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                                    errors.version 
+                                        ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                        : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                                } focus:outline-none placeholder-ash-gray`}
                                 placeholder="v1.0.0"
                             />
-                            {errors.version && <span className="error-message">{errors.version}</span>}
+                            {errors.version && <div className="text-forge-red font-medium text-sm mt-1">{errors.version}</div>}
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="languages" className="form-label">
+                    <div>
+                        <label htmlFor="languages" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
                             Crafting Materials (Programming Languages)
                         </label>
                         <input
@@ -219,16 +235,16 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                             name="languages"
                             value={formData.languages}
                             onChange={handleChange}
-                            className="form-input"
+                            className="w-full px-4 py-3 rounded-lg bg-iron-light text-silver border border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20 focus:outline-none placeholder-ash-gray transition-all duration-300 min-h-[44px]"
                             placeholder="JavaScript, Python, CSS, HTML"
                         />
-                        <small className="form-help">
+                        <div className="text-xs text-ash-gray mt-1">
                             Separate multiple languages with commas
-                        </small>
+                        </div>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="projectImage" className="form-label">
+                    <div>
+                        <label htmlFor="projectImage" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
                             Project Image
                         </label>
                         <input
@@ -236,21 +252,28 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                             id="projectImage"
                             accept="image/*"
                             onChange={handleImageUpload}
-                            className="form-input"
+                            className="w-full px-4 py-3 rounded-lg bg-iron-light text-silver border border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20 focus:outline-none transition-all duration-300 min-h-[44px] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-forge-orange file:text-white file:font-medium hover:file:bg-forge-red"
                         />
-                        {errors.image && <span className="error-message">{errors.image}</span>}
-                        <small className="form-help">
+                        {errors.image && <div className="text-forge-red font-medium text-sm mt-1">{errors.image}</div>}
+                        <div className="text-xs text-ash-gray mt-1">
                             Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP
-                        </small>
+                        </div>
                     </div>
 
-                    {errors.submit && <div className="error-message">{errors.submit}</div>}
+                    {errors.submit && <div className="text-forge-red font-medium text-sm text-center">{errors.submit}</div>}
 
-                    <div className="form-actions">
-                        <button type="submit" className="btn btn-primary">
-                            Save Changes
+                    <div className="flex gap-4 pt-4">
+                        <button 
+                            type="submit" 
+                            className="flex-1 px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95"
+                        >
+                            ✨ Save Changes
                         </button>
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                        <button 
+                            type="button" 
+                            className="px-8 py-4 rounded-xl font-semibold bg-transparent text-forge-orange border-2 border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white hover:-translate-y-0.5"
+                            onClick={onClose}
+                        >
                             Cancel
                         </button>
                     </div>

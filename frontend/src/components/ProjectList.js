@@ -33,9 +33,9 @@ const ProjectList = ({ userId, isOwnProfile }) => {
 
   if (loading) {
     return (
-      <section className="project-list">
-        <div className="card text-center">
-          <h3>Loading projects...</h3>
+      <section>
+        <div className="bg-iron-light rounded-xl p-8 text-center">
+          <h3 className="text-xl font-semibold text-forge-yellow">Loading projects...</h3>
         </div>
       </section>
     );
@@ -43,10 +43,10 @@ const ProjectList = ({ userId, isOwnProfile }) => {
 
   if (error) {
     return (
-      <section className="project-list">
-        <div className="card text-center">
-          <h3>Error loading projects</h3>
-          <p>{error}</p>
+      <section>
+        <div className="bg-iron-light rounded-xl p-8 text-center">
+          <h3 className="text-xl font-semibold text-forge-red">Error loading projects</h3>
+          <p className="text-ash-gray">{error}</p>
         </div>
       </section>
     );
@@ -56,36 +56,36 @@ const ProjectList = ({ userId, isOwnProfile }) => {
   const inactiveProjects = projects.filter(p => p.status === 'inactive');
 
   return (
-    <section className="project-list">
-      <div className="project-list-header">
-        <h3>{isOwnProfile ? 'My Projects' : 'Projects'}</h3>
-        <div className="project-summary">
-          <span className="summary-item">
-            <span className="summary-count">{projects.length}</span>
-            <span className="summary-label">Total Projects</span>
-          </span>
-          <span className="summary-item">
-            <span className="summary-count">{activeProjects.length}</span>
-            <span className="summary-label">Active</span>
-          </span>
-          <span className="summary-item">
-            <span className="summary-count">{inactiveProjects.length}</span>
-            <span className="summary-label">Inactive</span>
-          </span>
+    <section>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <h3 className="text-2xl font-semibold text-forge-yellow">🚀 {isOwnProfile ? 'My Projects' : 'Projects'}</h3>
+        <div className="flex gap-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-forge-orange">{projects.length}</div>
+            <div className="text-xs text-ash-gray uppercase tracking-wide">Total</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-400">{activeProjects.length}</div>
+            <div className="text-xs text-ash-gray uppercase tracking-wide">Active</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-400">{inactiveProjects.length}</div>
+            <div className="text-xs text-ash-gray uppercase tracking-wide">Inactive</div>
+          </div>
         </div>
       </div>
 
-      <div className="projects-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map(project => (
           <ProjectPreview key={project._id} project={project} />
         ))}
       </div>
 
       {projects.length === 0 && (
-        <div className="no-projects">
-          <div className="no-projects-icon">🔨</div>
-          <h4>No Projects Yet</h4>
-          <p>{isOwnProfile ? 'Start forging your first project to see it here!' : 'This user hasn\'t created any projects yet.'}</p>
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔨</div>
+          <h4 className="text-xl font-semibold text-silver mb-2">No Projects Yet</h4>
+          <p className="text-ash-gray">{isOwnProfile ? 'Start forging your first project to see it here!' : 'This user hasn\'t created any projects yet.'}</p>
         </div>
       )}
     </section>

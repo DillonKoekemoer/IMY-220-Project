@@ -72,44 +72,51 @@ const LoginForm = ({ onLogin }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="auth-form">
-            <h2 className="text-center mb-3">Welcome Back</h2>
+        <form onSubmit={handleSubmit}>
+            <h2 className="text-center mb-6 text-xl font-semibold text-silver">Welcome Back</h2>
             
-            <div className="form-group">
-                <label htmlFor="email" className="form-label">Email Address</label>
+            <div className="mb-6">
+                <label htmlFor="email" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Email Address</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`form-input ${errors.email ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.email 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="Enter your email"
                 />
-                {errors.email && <div className="error-message">{errors.email}</div>}
+                {errors.email && <div className="text-forge-red font-medium text-sm mt-1">{errors.email}</div>}
             </div>
 
-            <div className="form-group">
-                <label htmlFor="password" className="form-label">Password</label>
+            <div className="mb-6">
+                <label htmlFor="password" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Password</label>
                 <input
                     type="password"
                     id="password"
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`form-input ${errors.password ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.password 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="Enter your password"
                 />
-                {errors.password && <div className="error-message">{errors.password}</div>}
+                {errors.password && <div className="text-forge-red font-medium text-sm mt-1">{errors.password}</div>}
             </div>
 
-            {errors.submit && <div className="error-message mb-2">{errors.submit}</div>}
+            {errors.submit && <div className="text-forge-red font-medium text-sm mb-4 text-center">{errors.submit}</div>}
 
             <button 
                 type="submit" 
-                className="btn btn-primary" 
+                className="w-full px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-h-[52px]"
                 disabled={isSubmitting}
-                style={{ width: '100%' }}
             >
                 {isSubmitting ? 'Logging in...' : 'Login'}
             </button>

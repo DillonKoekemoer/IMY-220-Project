@@ -6,8 +6,7 @@ import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ProjectPage from './pages/ProjectPage';
 import Header from './components/Header';
-import './styles/main.css';
-import './styles/utils.css';
+import './styles/tailwind.css';
 
 const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false); 
@@ -46,7 +45,7 @@ const App = () => {
     };
 
     return (
-        <div className="app">
+        <div className="min-h-screen bg-iron-dark">
             <Routes>
                 <Route 
                     path="/" 

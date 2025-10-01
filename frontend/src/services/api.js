@@ -35,6 +35,7 @@ export const authAPI = {
 
     logout: () => {
         localStorage.removeItem('token');
+        localStorage.clear(); // Clear all localStorage to ensure fresh start
     }
 };
 
@@ -203,6 +204,33 @@ export const projectsAPI = {
         });
         if (!response.ok) throw new Error('Failed to delete project');
         return response.json();
+    },
+
+    joinProject: async (projectId) => {
+        const response = await fetch(`${API_BASE_URL}/projects/${projectId}/join`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to join project');
+        }
+        return response.json();
+    },
+
+    leaveProject: async (projectId) => {
+        const response = await fetch(`${API_BASE_URL}/projects/${projectId}/leave`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        if (!response.ok) throw new Error('Failed to leave project');
+        return response.json();
+    },
+
+    getCollaborators: async (projectId) => {
+        const response = await fetch(`${API_BASE_URL}/projects/${projectId}/collaborators`);
+        if (!response.ok) throw new Error('Failed to fetch collaborators');
+        return response.json();
     }
 };
 
@@ -215,6 +243,15 @@ export const friendsAPI = {
             body: JSON.stringify({ userId, friendId })
         });
         if (!response.ok) throw new Error('Failed to add friend');
+        return response.json();
+    },
+
+    removeFriend: async (userId, friendId) => {
+        const response = await fetch(`${API_BASE_URL}/friends/${userId}/${friendId}`, {
+            method: 'DELETE',
+            headers: { ...getAuthHeaders() }
+        });
+        if (!response.ok) throw new Error('Failed to remove friend');
         return response.json();
     },
 

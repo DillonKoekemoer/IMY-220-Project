@@ -89,102 +89,125 @@ const SignUpForm = ({ onSignUp }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="auth-form">
-            <h2 className="text-center mb-3">Join CodeForge</h2>
+        <form onSubmit={handleSubmit}>
+            <h2 className="text-center mb-6 text-xl font-semibold text-silver">Join CodeForge</h2>
             
-            <div className="grid grid-2">
-                <div className="form-group">
-                    <label htmlFor="firstName" className="form-label">First Name</label>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label htmlFor="firstName" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">First Name</label>
                     <input
                         type="text"
                         id="firstName"
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleChange}
-                        className={`form-input ${errors.firstName ? 'error' : ''}`}
+                        className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                            errors.firstName 
+                                ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                        } focus:outline-none placeholder-ash-gray`}
                         placeholder="John"
                     />
-                    {errors.firstName && <div className="error-message">{errors.firstName}</div>}
+                    {errors.firstName && <div className="text-forge-red font-medium text-sm mt-1">{errors.firstName}</div>}
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                <div>
+                    <label htmlFor="lastName" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Last Name</label>
                     <input
                         type="text"
                         id="lastName"
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleChange}
-                        className={`form-input ${errors.lastName ? 'error' : ''}`}
+                        className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                            errors.lastName 
+                                ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                        } focus:outline-none placeholder-ash-gray`}
                         placeholder="Doe"
                     />
-                    {errors.lastName && <div className="error-message">{errors.lastName}</div>}
+                    {errors.lastName && <div className="text-forge-red font-medium text-sm mt-1">{errors.lastName}</div>}
                 </div>
             </div>
 
-            <div className="form-group">
-                <label htmlFor="username" className="form-label">Username</label>
+            <div className="mb-4">
+                <label htmlFor="username" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Username</label>
                 <input
                     type="text"
                     id="username"
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
-                    className={`form-input ${errors.username ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.username 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="johndoe"
                 />
-                {errors.username && <div className="error-message">{errors.username}</div>}
+                {errors.username && <div className="text-forge-red font-medium text-sm mt-1">{errors.username}</div>}
             </div>
 
-            <div className="form-group">
-                <label htmlFor="email" className="form-label">Email Address</label>
+            <div className="mb-4">
+                <label htmlFor="email" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Email Address</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`form-input ${errors.email ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.email 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="john@example.com"
                 />
-                {errors.email && <div className="error-message">{errors.email}</div>}
+                {errors.email && <div className="text-forge-red font-medium text-sm mt-1">{errors.email}</div>}
             </div>
 
-            <div className="form-group">
-                <label htmlFor="password" className="form-label">Password</label>
+            <div className="mb-4">
+                <label htmlFor="password" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Password</label>
                 <input
                     type="password"
                     id="password"
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`form-input ${errors.password ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.password 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="Enter your password"
                 />
-                {errors.password && <div className="error-message">{errors.password}</div>}
+                {errors.password && <div className="text-forge-red font-medium text-sm mt-1">{errors.password}</div>}
             </div>
 
-            <div className="form-group">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+            <div className="mb-6">
+                <label htmlFor="confirmPassword" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">Confirm Password</label>
                 <input
                     type="password"
                     id="confirmPassword"
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`form-input ${errors.confirmPassword ? 'error' : ''}`}
+                    className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                        errors.confirmPassword 
+                            ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                            : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                    } focus:outline-none placeholder-ash-gray`}
                     placeholder="Confirm your password"
                 />
-                {errors.confirmPassword && <div className="error-message">{errors.confirmPassword}</div>}
+                {errors.confirmPassword && <div className="text-forge-red font-medium text-sm mt-1">{errors.confirmPassword}</div>}
             </div>
 
-            {errors.submit && <div className="error-message mb-2">{errors.submit}</div>}
+            {errors.submit && <div className="text-forge-red font-medium text-sm mb-4 text-center">{errors.submit}</div>}
 
             <button 
                 type="submit" 
-                className="btn btn-primary" 
+                className="w-full px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed min-h-[52px]"
                 disabled={isSubmitting}
-                style={{ width: '100%' }}
             >
                 {isSubmitting ? 'Creating Account...' : 'Sign Up'}
             </button>

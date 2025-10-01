@@ -45,6 +45,7 @@ const authenticateToken = (req, res, next) => {
     
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
+        console.log('Authenticated user from token:', user);
         req.user = user;
         next();
     });
@@ -74,8 +75,9 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         
-        const userId = user._id.toString ? user._id.toString() : user._id;
+        const userId = user._id.toString();
         const token = jwt.sign({ userId, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
+        console.log('Login - Generated token for user:', { userId, email: user.email });
         res.json({ token, user: { _id: userId, name: user.name, email: user.email } });
     } catch (error) {
         console.error('Login error:', error);
@@ -244,6 +246,28 @@ app.post('/api/users/add-friend', async (req, res) => {
         res.status(201).json({ message: 'Friend added successfully', _id: result.insertedId });
     } catch (error) {
         console.error('Add friend error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Remove friend endpoint
+app.delete('/api/friends/:userId/:friendId', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { userId, friendId } = req.params;
+        console.log('Removing friend:', { userId, friendId });
+        
+        const result = await db.collection('Friends').deleteOne({ userId, friendId });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Friendship not found' });
+        }
+        
+        console.log('Friend removed successfully');
+        res.json({ message: 'Friend removed successfully' });
+    } catch (error) {
+        console.error('Remove friend error:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -515,6 +539,85 @@ app.get('/api/friends/:userId', async (req, res) => {
             .toArray();
             
         res.json(friends);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Project collaboration endpoints
+app.post('/api/projects/:projectId/join', authenticateToken, async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { projectId } = req.params;
+        const userId = req.user.userId;
+        
+        console.log('Join project request:', { projectId, userId });
+        
+        if (!ObjectId.isValid(projectId)) {
+            return res.status(400).json({ error: 'Invalid project ID' });
+        }
+        
+        const project = await db.collection('Projects').findOne({ _id: new ObjectId(projectId) });
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+        
+        // Check if user is the owner
+        if (project.userId === userId) {
+            return res.status(400).json({ error: 'Cannot join your own project' });
+        }
+        
+        const collaborators = project.collaborators || [];
+        if (collaborators.includes(userId)) {
+            return res.status(400).json({ error: 'Already a collaborator' });
+        }
+        
+        await db.collection('Projects').updateOne(
+            { _id: new ObjectId(projectId) },
+            { $push: { collaborators: userId } }
+        );
+        
+        console.log('User joined project successfully');
+        res.json({ message: 'Joined project successfully' });
+    } catch (error) {
+        console.error('Join project error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.delete('/api/projects/:projectId/leave', authenticateToken, async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { projectId } = req.params;
+        const userId = req.user.userId;
+        
+        await db.collection('Projects').updateOne(
+            { _id: new ObjectId(projectId) },
+            { $pull: { collaborators: userId } }
+        );
+        
+        res.json({ message: 'Left project successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/projects/:projectId/collaborators', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { projectId } = req.params;
+        const project = await db.collection('Projects').findOne({ _id: new ObjectId(projectId) });
+        
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+        
+        const collaboratorIds = project.collaborators || [];
+        const validIds = collaboratorIds.filter(id => ObjectId.isValid(id));
+        const collaborators = await db.collection('Users')
+            .find({ _id: { $in: validIds.map(id => new ObjectId(id)) } })
+            .toArray();
+            
+        res.json(collaborators);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

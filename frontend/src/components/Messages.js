@@ -41,60 +41,66 @@ const Messages = ({ projectId }) => {
 
     if (loading) {
         return (
-            <div className="card">
-                <h3>Project Activity</h3>
-                <div className="loading">Loading activity...</div>
+            <div className="text-ash-gray text-center py-8">
+                Loading activity...
             </div>
         );
     }
 
     return (
-        <div className="card">
-            <h3>Project Activity</h3>
-            <div className="messages-container">
-                {posts.length > 0 ? (
-                    posts.map(post => {
-                        const user = users[post.userId];
-                        const timeAgo = new Date(post.createdAt).toLocaleDateString();
-                        
-                        return (
-                            <div key={post._id} className="message-item post-item">
-                                <div className="message-header">
-                                    <div className="message-user">
-                                        <span className="action-icon">💬</span>
-                                        <strong>{user?.name || 'Unknown User'}</strong>
-                                        <span className="action-text">posted</span>
+        <div className="space-y-6">
+            {posts.length > 0 ? (
+                posts.map(post => {
+                    const user = users[post.userId];
+                    const timeAgo = new Date(post.createdAt).toLocaleDateString();
+                    
+                    return (
+                        <div key={post._id} className="bg-iron-light rounded-xl p-6 border border-steel-blue/30 transition-all duration-300 hover:border-forge-orange/50">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-fire text-white flex items-center justify-center font-semibold text-sm">
+                                        {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                                     </div>
-                                    <div className="message-timestamp">
-                                        {timeAgo}
-                                    </div>
-                                </div>
-                                <div className="message-content">
-                                    <p>{post.content}</p>
-                                    {post.hashtags && post.hashtags.length > 0 && (
-                                        <div className="hashtags">
-                                            {post.hashtags.map(tag => (
-                                                <span key={tag} className="hashtag">#{tag}</span>
-                                            ))}
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-forge-yellow font-semibold">{user?.name || 'Unknown User'}</span>
+                                            <span className="text-ash-gray text-sm">posted</span>
                                         </div>
-                                    )}
+                                        <div className="text-ash-gray text-xs">
+                                            {timeAgo}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        );
-                    })
-                ) : (
-                    <div className="no-messages">
-                        <p>No activity yet. Be the first to post an update!</p>
-                    </div>
-                )}
-            </div>
-            
-            <div className="message-stats">
-                <div className="stat-item">
-                    <span className="stat-label">Total Posts:</span>
-                    <span className="stat-value">{posts.length}</span>
+                            <div className="text-silver leading-relaxed mb-4">
+                                {post.content}
+                            </div>
+                            {post.hashtags && post.hashtags.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                    {post.hashtags.map(tag => (
+                                        <span key={tag} className="bg-forge-orange/20 text-forge-orange px-3 py-1 rounded-full text-xs font-semibold border border-forge-orange/30">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })
+            ) : (
+                <div className="text-center py-12 text-ash-gray">
+                    <div className="text-4xl mb-4">💬</div>
+                    <p className="text-lg">No activity yet</p>
+                    <p className="text-sm">Project updates will appear here</p>
                 </div>
-            </div>
+            )}
+            
+            {posts.length > 0 && (
+                <div className="bg-iron-gray/50 rounded-lg p-4 flex justify-between items-center">
+                    <span className="text-ash-gray text-sm">Total Posts:</span>
+                    <span className="text-forge-yellow font-semibold">{posts.length}</span>
+                </div>
+            )}
         </div>
     );
 };

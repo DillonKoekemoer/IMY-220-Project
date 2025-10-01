@@ -29,14 +29,14 @@ const CreatePost = ({ currentUser, projectId, onPostCreated }) => {
     };
 
     return (
-        <div className="card">
-            <h4>Share an Update</h4>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
+        <div className="bg-iron-light rounded-xl p-6 border-2 border-steel-blue">
+            <h4 className="text-lg font-semibold text-forge-yellow mb-4">💬 Share an Update</h4>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        className="form-input"
+                        className="w-full px-4 py-3 rounded-lg bg-iron-gray text-silver border border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20 focus:outline-none placeholder-ash-gray transition-all duration-300 resize-none disabled:opacity-50"
                         rows="3"
                         placeholder="Share what you're working on..."
                         disabled={isSubmitting}
@@ -44,10 +44,10 @@ const CreatePost = ({ currentUser, projectId, onPostCreated }) => {
                 </div>
                 <button 
                     type="submit" 
-                    className="btn btn-primary"
+                    className="px-6 py-3 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     disabled={!content.trim() || isSubmitting}
                 >
-                    {isSubmitting ? 'Posting...' : 'Post Update'}
+                    {isSubmitting ? '⏳ Posting...' : '🚀 Post Update'}
                 </button>
             </form>
         </div>

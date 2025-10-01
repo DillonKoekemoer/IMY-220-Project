@@ -56,9 +56,9 @@ const ProjectFeed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }
 
     if (loading) {
         return (
-            <section className="feed">
-                <div className="card text-center">
-                    <h3>Loading projects...</h3>
+            <section>
+                <div className="bg-iron-light text-silver rounded-xl shadow-forge p-8 border-2 border-steel-blue text-center">
+                    <h3 className="text-xl font-semibold text-forge-yellow">Loading projects...</h3>
                 </div>
             </section>
         );
@@ -66,10 +66,10 @@ const ProjectFeed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }
 
     if (error) {
         return (
-            <section className="feed">
-                <div className="card text-center">
-                    <h3>Error loading projects</h3>
-                    <p>{error}</p>
+            <section>
+                <div className="bg-iron-light text-silver rounded-xl shadow-forge p-8 border-2 border-steel-blue text-center">
+                    <h3 className="text-xl font-semibold text-forge-red">Error loading projects</h3>
+                    <p className="text-ash-gray">{error}</p>
                 </div>
             </section>
         );
@@ -96,11 +96,11 @@ const ProjectFeed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }
     };
 
     return (
-        <section className="feed">
+        <section>
             {filteredProjects.length > 0 ? (
-                <div className="feed-items">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredProjects.map(project => (
-                        <div key={project._id} onClick={() => handleProjectClick(project)}>
+                        <div key={project._id} onClick={() => handleProjectClick(project)} className="cursor-pointer">
                             <ProjectPreview 
                                 project={project} 
                                 author={users[project.userId]} 
@@ -109,10 +109,10 @@ const ProjectFeed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }
                     ))}
                 </div>
             ) : (
-                <div className="card empty-feed">
-                    <div className="empty-icon">📁</div>
-                    <h3>No projects found</h3>
-                    <p>{type === 'global' ? 'No projects available yet!' : 'Follow some friends to see their projects!'}</p>
+                <div className="bg-iron-light text-silver rounded-xl shadow-forge p-8 border-2 border-steel-blue text-center">
+                    <div className="text-4xl mb-4">📁</div>
+                    <h3 className="text-xl font-semibold mb-2 text-forge-yellow">No projects found</h3>
+                    <p className="text-ash-gray">{type === 'global' ? 'No projects available yet!' : 'Follow some friends to see their projects!'}</p>
                 </div>
             )}
         </section>

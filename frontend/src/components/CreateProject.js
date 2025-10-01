@@ -125,15 +125,15 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
     };
 
     const formContent = (
-        <div className={isModal ? "modal-content" : "section-content"}>
-            <div className="modal-header">
-                <h3>Create New Project</h3>
-                {isModal && <button className="modal-close" onClick={onClose}>×</button>}
+        <div className={isModal ? "bg-iron-gray text-silver rounded-xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-forge-hover border-2 border-forge-orange animate-modal-slide-in" : ""}>
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-semibold text-forge-yellow">Create New Project</h3>
+                {isModal && <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>}
             </div>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="projectName" className="form-label">
-                        Project Name <span style={{color: 'red'}}>*</span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label htmlFor="projectName" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                        Project Name <span className="text-forge-red">*</span>
                     </label>
                     <input
                         type="text"
@@ -141,27 +141,35 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`form-input ${errors.name ? 'error' : ''}`}
+                        className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                            errors.name 
+                                ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                        } focus:outline-none placeholder-ash-gray disabled:opacity-50`}
                         required
                         maxLength="100"
                         disabled={isSubmitting}
                         placeholder="Enter project name"
                     />
                     {errors.name && (
-                        <div className="error-message">{errors.name}</div>
+                        <div className="text-forge-red font-medium text-sm mt-1">{errors.name}</div>
                     )}
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="description" className="form-label">
-                        Description <span style={{color: 'red'}}>*</span> ({formData.description.length}/1000)
+                <div>
+                    <label htmlFor="description" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                        Description <span className="text-forge-red">*</span> <span className="text-ash-gray normal-case">({formData.description.length}/1000)</span>
                     </label>
                     <textarea
                         id="description"
                         name="description"
                         value={formData.description}
                         onChange={handleChange}
-                        className={`form-input ${errors.description ? 'error' : ''}`}
+                        className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 resize-none ${
+                            errors.description 
+                                ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                        } focus:outline-none placeholder-ash-gray disabled:opacity-50`}
                         rows="3"
                         required
                         maxLength="1000"
@@ -169,21 +177,25 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                         placeholder="Describe your project..."
                     />
                     {errors.description && (
-                        <div className="error-message">{errors.description}</div>
+                        <div className="text-forge-red font-medium text-sm mt-1">{errors.description}</div>
                     )}
                 </div>
 
-                <div className="grid grid-2">
-                    <div className="form-group">
-                        <label htmlFor="type" className="form-label">
-                            Project Type <span style={{color: 'red'}}>*</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="type" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                            Project Type <span className="text-forge-red">*</span>
                         </label>
                         <select
                             id="type"
                             name="type"
                             value={formData.type}
                             onChange={handleChange}
-                            className={`form-input ${errors.type ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] cursor-pointer ${
+                                errors.type 
+                                    ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                    : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                            } focus:outline-none disabled:opacity-50`}
                             required
                             disabled={isSubmitting}
                         >
@@ -193,13 +205,13 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                             ))}
                         </select>
                         {errors.type && (
-                            <div className="error-message">{errors.type}</div>
+                            <div className="text-forge-red font-medium text-sm mt-1">{errors.type}</div>
                         )}
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="version" className="form-label">
-                            Version <span style={{color: 'red'}}>*</span>
+                    <div>
+                        <label htmlFor="version" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                            Version <span className="text-forge-red">*</span>
                         </label>
                         <input
                             type="text"
@@ -207,21 +219,25 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                             name="version"
                             value={formData.version}
                             onChange={handleChange}
-                            className={`form-input ${errors.version ? 'error' : ''}`}
+                            className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                                errors.version 
+                                    ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                    : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                            } focus:outline-none placeholder-ash-gray disabled:opacity-50`}
                             required
                             disabled={isSubmitting}
                             placeholder="1.0.0"
                             pattern="^\d+\.\d+\.\d+$"
                         />
                         {errors.version && (
-                            <div className="error-message">{errors.version}</div>
+                            <div className="text-forge-red font-medium text-sm mt-1">{errors.version}</div>
                         )}
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="languages" className="form-label">
-                        Programming Languages (comma-separated)
+                <div>
+                    <label htmlFor="languages" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
+                        Programming Languages
                     </label>
                     <input
                         type="text"
@@ -229,34 +245,38 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                         name="languages"
                         value={formData.languages}
                         onChange={handleChange}
-                        className={`form-input ${errors.languages ? 'error' : ''}`}
+                        className={`w-full px-4 py-3 rounded-lg bg-iron-light text-silver border transition-all duration-300 min-h-[44px] ${
+                            errors.languages 
+                                ? 'border-red-500 focus:ring-4 focus:ring-red-500/20' 
+                                : 'border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20'
+                        } focus:outline-none placeholder-ash-gray disabled:opacity-50`}
                         placeholder="JavaScript, Python, CSS"
                         disabled={isSubmitting}
                     />
                     {errors.languages && (
-                        <div className="error-message">{errors.languages}</div>
+                        <div className="text-forge-red font-medium text-sm mt-1">{errors.languages}</div>
                     )}
-                    <small className="text-muted">
+                    <div className="text-xs text-ash-gray mt-1">
                         Separate multiple languages with commas
-                    </small>
+                    </div>
                 </div>
 
                 {errors.submit && (
-                    <div className="error-message">{errors.submit}</div>
+                    <div className="text-forge-red font-medium text-sm text-center">{errors.submit}</div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex gap-4 pt-4">
                     <button 
                         type="submit" 
-                        className="btn btn-primary"
+                        className="flex-1 px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? 'Creating...' : 'Create Project'}
+                        {isSubmitting ? '⚡ Creating...' : '🚀 Create Project'}
                     </button>
                     {isModal && (
                         <button 
                             type="button" 
-                            className="btn btn-secondary" 
+                            className="px-8 py-4 rounded-xl font-semibold bg-transparent text-forge-orange border-2 border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white hover:-translate-y-0.5 disabled:opacity-50"
                             onClick={onClose}
                             disabled={isSubmitting}
                         >
@@ -269,7 +289,7 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
     );
 
     return isModal ? (
-        <div className="modal-overlay">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg animate-fade-in p-4">
             {formContent}
         </div>
     ) : formContent;

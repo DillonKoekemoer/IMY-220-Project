@@ -60,18 +60,18 @@ const ActivitySidebar = ({ type, currentUser }) => {
 
     if (loading) {
         return (
-            <div className="activity-sidebar">
-                <h3>Recent Activity</h3>
-                <div className="activity-loading">Loading...</div>
+            <div className="bg-gradient-steel text-silver rounded-xl p-6 shadow-forge border-2 border-steel-blue">
+                <h3 className="text-lg font-semibold text-forge-yellow mb-4">Recent Activity</h3>
+                <div className="text-center text-ash-gray">Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className="activity-sidebar">
-            <h3>Recent Activity</h3>
+        <div className="bg-gradient-steel text-silver rounded-xl p-6 shadow-forge border-2 border-steel-blue">
+            <h3 className="text-lg font-semibold text-forge-yellow mb-4">Recent Activity</h3>
             {activities.length > 0 ? (
-                <div className="activity-list">
+                <div className="space-y-4">
                     {activities.map(activity => {
                         const user = users[activity.userId];
                         const timeAgo = new Date(activity.createdAt).toLocaleDateString();
@@ -79,19 +79,19 @@ const ActivitySidebar = ({ type, currentUser }) => {
                         return (
                             <div 
                                 key={activity._id} 
-                                className="activity-item"
+                                className="bg-iron-light p-4 rounded-lg border border-ash-gray/30 cursor-pointer transition-all duration-300 hover:border-forge-orange hover:bg-iron-gray hover:-translate-y-1"
                                 onClick={() => handleActivityClick(activity)}
                             >
-                                <div className="activity-header">
-                                    <div className="activity-avatar">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-fire text-white flex items-center justify-center text-sm font-semibold">
                                         {user?.name?.charAt(0) || '?'}
                                     </div>
-                                    <div className="activity-info">
-                                        <div className="activity-user">{user?.name || 'Unknown'}</div>
-                                        <div className="activity-time">{timeAgo}</div>
+                                    <div className="flex-1">
+                                        <div className="text-sm font-medium text-silver">{user?.name || 'Unknown'}</div>
+                                        <div className="text-xs text-ash-gray">{timeAgo}</div>
                                     </div>
                                 </div>
-                                <div className="activity-content">
+                                <div className="text-sm text-ash-gray leading-relaxed">
                                     {activity.content.length > 60 
                                         ? `${activity.content.substring(0, 60)}...` 
                                         : activity.content
@@ -102,8 +102,9 @@ const ActivitySidebar = ({ type, currentUser }) => {
                     })}
                 </div>
             ) : (
-                <div className="no-activities">
-                    <p>No recent activity</p>
+                <div className="text-center py-8">
+                    <div className="text-2xl mb-2">💭</div>
+                    <p className="text-ash-gray">No recent activity</p>
                 </div>
             )}
         </div>
