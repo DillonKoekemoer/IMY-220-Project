@@ -1,5 +1,6 @@
 // Dillon Koekemoer u23537052
 import React, { useState } from 'react';
+import { usersAPI } from '../services/api';
 
 const EditProfile = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -51,18 +52,20 @@ const EditProfile = ({ user, onClose, onSave }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         if (validateForm()) {
-            setTimeout(() => {
+            try {
+                await usersAPI.update(user._id, formData);
                 onSave(formData);
-                setIsSubmitting(false);
-            }, 500);
-        } else {
-            setIsSubmitting(false);
+            } catch (error) {
+                console.error('Failed to update profile:', error);
+                setErrors({ submit: 'Failed to update profile. Please try again.' });
+            }
         }
+        setIsSubmitting(false);
     };
 
     const handleChange = (e) => {
@@ -172,6 +175,9 @@ const EditProfile = ({ user, onClose, onSave }) => {
                             <div className="error-message">{errors.website}</div>
                         )}
                     </div>
+                    {errors.submit && (
+                        <div className="error-message" style={{marginBottom: '1rem'}}>{errors.submit}</div>
+                    )}
                     <div className="flex gap-2">
                         <button 
                             type="submit" 

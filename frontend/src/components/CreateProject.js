@@ -1,5 +1,6 @@
 // Dillon Koekemoer u23537052
 import React, { useState } from 'react';
+import { postsAPI } from '../services/api';
 
 const CreateProject = ({ onClose, onSave, isModal = true }) => {
     const [formData, setFormData] = useState({
@@ -72,23 +73,32 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         if (validateForm()) {
-            const processedData = {
-                ...formData,
-                languages: formData.languages
-                    .split(',')
-                    .map(lang => lang.trim())
-                    .filter(lang => lang.length > 0)
-            };
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                const processedData = {
+                    ...formData,
+                    languages: formData.languages
+                        .split(',')
+                        .map(lang => lang.trim())
+                        .filter(lang => lang.length > 0),
+                    createdAt: new Date().toISOString(),
+                    status: 'active',
+                    userId: currentUser._id || currentUser.id
+                };
 
-            setTimeout(() => {
-                onSave(processedData);
+                const result = await postsAPI.create(processedData);
+                onSave(result);
+            } catch (error) {
+                console.error('Create project error:', error);
+                setErrors({ submit: error.message || 'Failed to create project' });
+            } finally {
                 setIsSubmitting(false);
-            }, 500);
+            }
         } else {
             setIsSubmitting(false);
         }
@@ -219,6 +229,10 @@ const CreateProject = ({ onClose, onSave, isModal = true }) => {
                         Separate multiple languages with commas
                     </small>
                 </div>
+
+                {errors.submit && (
+                    <div className="error-message">{errors.submit}</div>
+                )}
 
                 <div className="flex gap-2">
                     <button 

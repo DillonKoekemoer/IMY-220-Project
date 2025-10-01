@@ -23,15 +23,22 @@ const App = () => {
         setCurrentUser(null);
     };
 
-    const ProfileWrapper = ({ currentUser, onLogout }) => {
+    const handleUserUpdate = (updatedUser) => {
+        setCurrentUser(updatedUser);
+    };
+
+    const ProfileWrapper = ({ currentUser, onLogout, onUserUpdate }) => {
         const { id } = useParams();
+        const profileId = id === 'me' ? currentUser?._id : id;
         return (
             <>
                 <Header currentUser={currentUser} onLogout={onLogout} />
                 <ProfilePage 
-                    key={id} 
+                    key={profileId} 
+                    profileId={profileId}
                     currentUser={currentUser} 
-                    onLogout={onLogout} 
+                    onLogout={onLogout}
+                    onUserUpdate={onUserUpdate}
                 />
             </>
         );
@@ -74,7 +81,8 @@ const App = () => {
                         isAuthenticated ? (
                             <ProfileWrapper 
                                 currentUser={currentUser} 
-                                onLogout={handleLogout} 
+                                onLogout={handleLogout}
+                                onUserUpdate={handleUserUpdate}
                             />
                         ) : (
                             <Navigate to="/" replace />
@@ -89,6 +97,20 @@ const App = () => {
                             <>
                                 <Header currentUser={currentUser} onLogout={handleLogout} />
                                 <ProjectPage currentUser={currentUser} />
+                            </>
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    } 
+                />
+
+                <Route 
+                    path="/post/:id" 
+                    element={
+                        isAuthenticated ? (
+                            <>
+                                <Header currentUser={currentUser} onLogout={handleLogout} />
+                                <ProjectPage currentUser={currentUser} isPost={true} />
                             </>
                         ) : (
                             <Navigate to="/" replace />

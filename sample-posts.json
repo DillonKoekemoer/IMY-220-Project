@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {"$oid": "68da3236ce97eaa32d16e58c"},
+    "title": "React Hook for API Calls",
+    "description": "Custom hook for handling API requests with loading states",
+    "codeSnippet": "import { useState, useEffect } from 'react';\n\nconst useApi = (url) => {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState(null);\n\n  useEffect(() => {\n    fetch(url)\n      .then(res => res.json())\n      .then(setData)\n      .catch(setError)\n      .finally(() => setLoading(false));\n  }, [url]);\n\n  return { data, loading, error };\n};",
+    "language": "javascript",
+    "author": "John Smith",
+    "hashtags": ["react", "hooks", "api"],
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "_id": {"$oid": "68da3237ce97eaa32d16e58d"},
+    "title": "Python Data Validation",
+    "description": "Simple email validation function in Python",
+    "codeSnippet": "import re\n\ndef validate_email(email):\n    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n    return re.match(pattern, email) is not None\n\n# Usage\nif validate_email('user@example.com'):\n    print('Valid email')\nelse:\n    print('Invalid email')",
+    "language": "python",
+    "author": "Sarah Johnson",
+    "hashtags": ["python", "validation", "regex"],
+    "createdAt": "2024-01-14T14:20:00Z"
+  },
+  {
+    "_id": {"$oid": "68da3238ce97eaa32d16e58e"},
+    "title": "CSS Flexbox Center",
+    "description": "Perfect centering with flexbox",
+    "codeSnippet": ".container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  min-height: 100vh;\n}\n\n.centered-content {\n  text-align: center;\n  padding: 2rem;\n  background: white;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n}",
+    "language": "css",
+    "author": "Mike Chen",
+    "hashtags": ["css", "flexbox", "centering"],
+    "createdAt": "2024-01-13T09:15:00Z"
+  },
+  {
+    "_id": {"$oid": "68da3239ce97eaa32d16e58f"},
+    "title": "Node.js Express Middleware",
+    "description": "Authentication middleware for Express.js",
+    "codeSnippet": "const jwt = require('jsonwebtoken');\n\nconst authenticateToken = (req, res, next) => {\n  const authHeader = req.headers['authorization'];\n  const token = authHeader && authHeader.split(' ')[1];\n\n  if (!token) {\n    return res.sendStatus(401);\n  }\n\n  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {\n    if (err) return res.sendStatus(403);\n    req.user = user;\n    next();\n  });\n};\n\nmodule.exports = authenticateToken;",
+    "language": "javascript",
+    "author": "Alex Rodriguez",
+    "hashtags": ["nodejs", "express", "jwt", "middleware"],
+    "createdAt": "2024-01-12T16:45:00Z"
+  },
+  {
+    "_id": {"$oid": "68da323ace97eaa32d16e590"},
+    "title": "SQL Query Optimization",
+    "description": "Optimized query for user analytics",
+    "codeSnippet": "SELECT \n  u.id,\n  u.username,\n  COUNT(p.id) as post_count,\n  AVG(p.likes) as avg_likes\nFROM users u\nLEFT JOIN posts p ON u.id = p.user_id\nWHERE u.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)\nGROUP BY u.id, u.username\nHAVING post_count > 0\nORDER BY avg_likes DESC\nLIMIT 10;",
+    "language": "sql",
+    "author": "Emma Wilson",
+    "hashtags": ["sql", "optimization", "analytics"],
+    "createdAt": "2024-01-11T11:30:00Z"
+  },
+  {
+    "_id": {"$oid": "68da323bce97eaa32d16e591"},
+    "title": "Java Stream API Example",
+    "description": "Processing collections with Java Streams",
+    "codeSnippet": "import java.util.*;\nimport java.util.stream.Collectors;\n\npublic class StreamExample {\n    public static void main(String[] args) {\n        List<Person> people = Arrays.asList(\n            new Person(\"John\", 25),\n            new Person(\"Jane\", 30),\n            new Person(\"Bob\", 35)\n        );\n        \n        List<String> names = people.stream()\n            .filter(p -> p.getAge() > 25)\n            .map(Person::getName)\n            .sorted()\n            .collect(Collectors.toList());\n            \n        System.out.println(names);\n    }\n}",
+    "language": "java",
+    "author": "David Kim",
+    "hashtags": ["java", "streams", "collections"],
+    "createdAt": "2024-01-10T13:20:00Z"
+  }
+]

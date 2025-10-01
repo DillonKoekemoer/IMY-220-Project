@@ -22,8 +22,8 @@ const ProjectPreview = ({ project }) => {
       <div className="project-header">
         <div className="project-title-section">
           <h3 className="project-title">
-            <Link to={`/project/${project.id}`} className="project-link">
-              {project.name}
+            <Link to={`/project/${project._id}`} className="project-link">
+              {project.title}
             </Link>
           </h3>
           <div className="project-status">
@@ -47,28 +47,26 @@ const ProjectPreview = ({ project }) => {
         
         <div className="project-meta">
           <div className="meta-row">
-            <span className="meta-label">Owner:</span>
-            <span className="meta-value">{project.owner}</span>
+            <span className="meta-label">Author:</span>
+            <span className="meta-value">{project.author}</span>
           </div>
-          {project.type && (
-            <div className="meta-row">
-              <span className="meta-label">Type:</span>
-              <span className="meta-value">{project.type}</span>
-            </div>
-          )}
           <div className="meta-row">
-            <span className="meta-label">Status:</span>
+            <span className="meta-label">Language:</span>
+            <span className="meta-value">{project.language}</span>
+          </div>
+          <div className="meta-row">
+            <span className="meta-label">Date:</span>
             <span className="meta-value">
-              {project.status === 'checked-in' ? 'Completed' : 'In Progress'}
+              {new Date(project.createdAt).toLocaleDateString()}
             </span>
           </div>
         </div>
 
-        {formatLanguages(project.languages).length > 0 && (
+        {project.hashtags && project.hashtags.length > 0 && (
           <div className="project-languages">
-            {formatLanguages(project.languages).map((language, index) => (
+            {project.hashtags.map((tag, index) => (
               <span key={index} className="language-tag">
-                #{language}
+                #{tag}
               </span>
             ))}
           </div>
@@ -89,9 +87,9 @@ const ProjectPreview = ({ project }) => {
         </div>
        < div className="project-actions">
           <Link 
-            to={`/project/${project.id}`} 
+            to={`/project/${project._id}`} 
             className="btn btn-sm btn-primary"
-            aria-label={`View details for ${project.name}`}
+            aria-label={`View details for ${project.title}`}
           >
             <span aria-hidden="true">📋</span>
             View Details

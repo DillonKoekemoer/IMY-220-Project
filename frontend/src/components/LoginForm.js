@@ -35,27 +35,31 @@ const LoginForm = ({ onLogin }) => {
 
         setIsSubmitting(true);
 
-        setTimeout(() => {
-            // Dummy info
-            const dummyUser = {
-                email: 'dillon.koek2@gmail.com',
-                password: 'password123',
-                name: 'Test User',
-                id: 1
-            };
+        try {
+            const response = await fetch('http://localhost:3001/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password
+                }),
+            });
 
-            if (
-                formData.email === dummyUser.email &&
-                formData.password === dummyUser.password
-            ) {
-                onLogin(dummyUser);
+            const data = await response.json();
+
+            if (response.ok) {
+                onLogin(data.user);
                 setErrors({});
             } else {
-                setErrors({ submit: 'Invalid email or password' });
+                setErrors({ submit: data.error || 'Login failed' });
             }
-
+        } catch (error) {
+            setErrors({ submit: 'Network error. Please try again.' });
+        } finally {
             setIsSubmitting(false);
-        }, 1000);
+        }
     };
 
     const handleChange = (e) => {

@@ -1,114 +1,199 @@
 // Dillon Koekemoer u23537052
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProjectPreview from './ProjectPreview';
+import { feedAPI, usersAPI } from '../services/api';
 
 const Feed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }) => {
-    // Dummy data 
-    const dummyProjects = [
-        {
-            id: 1,
-            name: "React Weather App",
-            description: "A beautiful weather application built with React and OpenWeather API",
-            owner: "John Doe",
-            version: "v1.2.0",
-            status: "checked-in",
-            languages: ["JavaScript", "React", "CSS"],
-            image: "/assets/images/weather-app.png",
-            type: "local"
-        },
-        {
-            id: 2,
-            name: "Python Data Analyzer",
-            description: "Data analysis tool for processing large CSV datasets",
-            owner: "Jane Smith",
-            version: "v2.1.0",
-            status: "checked-out",
-            languages: ["Python", "Pandas", "NumPy"],
-            image: "/assets/images/data-analyzer.png",
-            type: "global"
-        },
-        {
-            id: 3,
-            name: "Node.js API Server",
-            description: "RESTful API server with authentication and database integration",
-            owner: "Mike Johnson",
-            version: "v1.0.0",
-            status: "checked-in",
-            languages: ["JavaScript", "Node.js", "Express"],
-            image: "/assets/images/api-server.png",
-            type: "global"
-        },
-        {
-            id: 4,
-            name: "Personal Portfolio",
-            description: "A personal portfolio website showcasing projects and skills.",
-            owner: "You",
-            version: "v3.0.0",
-            status: "checked-in",
-            languages: ["HTML", "CSS", "JavaScript"],
-            image: "/assets/images/portfolio.png",
-            type: "local"
-        },
-        {
-            id: 5,
-            name: "something something something",
-            description: "A beautiful weather application built with React and OpenWeather API",
-            owner: "John Doe",
-            version: "v1.2.0",
-            status: "checked-in",
-            languages: ["JavaScript", "React", "CSS"],
-            image: "/assets/images/weather-app.png",
-            type: "local"
-        },
-        {
-            id: 6,
-            name: "React Weather App",
-            description: "A beautiful weather application built with React and OpenWeather API",
-            owner: "John Doe",
-            version: "v1.2.0",
-            status: "checked-in",
-            languages: ["JavaScript", "React", "CSS"],
-            image: "/assets/images/weather-app.png",
-            type: "local"
-        },
-    ];
+    const navigate = useNavigate();
+    const [feedItems, setFeedItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [users, setUsers] = useState({});
 
-    let filteredProjects = dummyProjects.filter(project => project.type === type);
+    useEffect(() => {
+        const fetchFeed = async () => {
+            try {
+                setLoading(true);
+                let data;
+                
+                if (type === 'global') {
+                    data = await feedAPI.getGlobal();
+                } else {
+                    data = await feedAPI.getLocal(currentUser._id);
+                }
+                
+                // Fetch user data for feed items
+                const userIds = [...new Set(data.map(item => item.userId).filter(Boolean))];
+                const userMap = {};
+                
+                if (userIds.length > 0) {
+                    try {
+                        const userPromises = userIds.map(id => usersAPI.getById(id).catch(() => null));
+                        const userData = await Promise.all(userPromises);
+                        
+                        userData.forEach(user => {
+                            if (user) userMap[user._id] = user;
+                        });
+                    } catch (userError) {
+                        console.warn('Failed to fetch some user data:', userError);
+                    }
+                }
+                
+                console.log('Feed items:', data);
+                console.log('User map:', userMap);
+                setUsers(userMap);
+                setFeedItems(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (currentUser) {
+            fetchFeed();
+        }
+    }, [type, currentUser]);
+
+    if (loading) {
+        return (
+            <section className="feed">
+                <div className="card text-center">
+                    <h3>Loading projects...</h3>
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className="feed">
+                <div className="card text-center">
+                    <h3>Error loading projects</h3>
+                    <p>{error}</p>
+                </div>
+            </section>
+        );
+    }
+
+    let filteredItems = feedItems;
 
     if (searchTerm) {
-        filteredProjects = filteredProjects.filter(project =>
-            project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            project.description.toLowerCase().includes(searchTerm.toLowerCase())
+        filteredItems = filteredItems.filter(item =>
+            (item.content || item.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (item.hashtags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
         );
     }
 
-    if (selectedLanguage !== 'all') {
-        filteredProjects = filteredProjects.filter(project =>
-            project.languages.includes(selectedLanguage)
-        );
-    }
-
-    filteredProjects.sort((a, b) => {
-        if (sortBy === 'name') {
-            return a.name.localeCompare(b.name);
-        } else if (sortBy === 'version') {
-            return b.version.localeCompare(a.version); 
-        } else if (sortBy === 'status') {
-            return a.status.localeCompare(b.status);
+    const handleItemClick = (item) => {
+        if (item.content) {
+            // Navigate to post detail
+            navigate(`/post/${item._id}`);
+        } else if (item.projectId) {
+            // Navigate to project detail
+            navigate(`/project/${item.projectId}`);
         }
-        return 0;
-    });
+    };
+
+    const renderFeedItem = (item) => {
+        const user = users[item.userId];
+        const timeAgo = new Date(item.createdAt).toLocaleDateString();
+        const isClickable = item.content || item.projectId;
+        
+        if (item.content) {
+            // This is a post
+            return (
+                <div 
+                    key={item._id} 
+                    className={`card feed-item post-item ${isClickable ? 'clickable' : ''}`}
+                    onClick={() => isClickable && handleItemClick(item)}
+                >
+                    <div className="feed-item-header">
+                        <div className="user-avatar">
+                            <div className="avatar-circle">{user?.name?.charAt(0) || '?'}</div>
+                        </div>
+                        <div className="user-info">
+                            <div 
+                                className="user-name" 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (user?._id) navigate(`/profile/${user._id}`);
+                                }}
+                                style={{ cursor: user?._id ? 'pointer' : 'default' }}
+                            >
+                                {user?.name || 'Unknown User'}
+                            </div>
+                            <div className="feed-time">{timeAgo}</div>
+                        </div>
+                        <div className="post-type-badge">Post</div>
+                    </div>
+                    <div className="feed-content">
+                        <p>{item.content}</p>
+                        {item.hashtags && item.hashtags.length > 0 && (
+                            <div className="hashtags">
+                                {item.hashtags.map(tag => (
+                                    <span key={tag} className="hashtag">#{tag}</span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div className="feed-stats">
+                        <span className="stat-item">❤️ {item.likes || 0}</span>
+                        <span className="stat-item">💬 {item.comments?.length || 0}</span>
+                        {isClickable && <span className="click-hint">Click to view details</span>}
+                    </div>
+                </div>
+            );
+        } else {
+            // This is an activity
+            return (
+                <div 
+                    key={item._id} 
+                    className={`card feed-item activity-item ${isClickable ? 'clickable' : ''}`}
+                    onClick={() => isClickable && handleItemClick(item)}
+                >
+                    <div className="feed-item-header">
+                        <div className="user-avatar">
+                            <div className="avatar-circle">{user?.name?.charAt(0) || '?'}</div>
+                        </div>
+                        <div className="user-info">
+                            <div 
+                                className="user-name" 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (user?._id) navigate(`/profile/${user._id}`);
+                                }}
+                                style={{ cursor: user?._id ? 'pointer' : 'default' }}
+                            >
+                                {user?.name || 'Unknown User'}
+                            </div>
+                            <div className="feed-time">{timeAgo}</div>
+                        </div>
+                        <div className="activity-type-badge">
+                            {item.type?.replace('_', ' ').toUpperCase()}
+                        </div>
+                    </div>
+                    <div className="feed-content">
+                        <p>{item.description}</p>
+                        {isClickable && <span className="click-hint">Click to view project</span>}
+                    </div>
+                </div>
+            );
+        }
+    };
 
     return (
         <section className="feed">
-            {filteredProjects.length > 0 ? (
-                filteredProjects.map(project => (
-                    <ProjectPreview key={project.id} project={project} />
-                ))
+            {filteredItems.length > 0 ? (
+                <div className="feed-items">
+                    {filteredItems.map(item => renderFeedItem(item))}
+                </div>
             ) : (
-                <div className="card text-center">
-                    <h3>No projects found</h3>
-                    <p>Start by creating your first project or following some users!</p>
+                <div className="card empty-feed">
+                    <div className="empty-icon">📭</div>
+                    <h3>No activity found</h3>
+                    <p>{type === 'global' ? 'No global activity yet!' : 'Follow some friends to see their updates!'}</p>
                 </div>
             )}
         </section>

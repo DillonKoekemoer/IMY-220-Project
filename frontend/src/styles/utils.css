@@ -1,12 +1,25 @@
 /* Header Navigation */
 .main-header {
-    background: linear-gradient(135deg, var(--primary-brown) 0%, var(--dark-brown) 100%);
+    background: var(--gradient-metal);
     padding: 15px 0;
-    box-shadow: 0 4px 8px var(--shadow-dark);
-    border-bottom: 2px solid var(--accent-orange);
+    box-shadow: 0 4px 8px var(--shadow-dark), 0 0 20px rgba(0,0,0,0.2);
+    border-bottom: 3px solid var(--accent-orange);
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(10px);
+    animation: headerSlideDown 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes headerSlideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .header-content {
@@ -29,7 +42,8 @@
 
 .logo:hover {
     color: var(--accent-orange);
-    transform: scale(1.05);
+    transform: scale(1.08) rotate(2deg);
+    text-shadow: 0 0 15px var(--accent-orange);
 }
 
 .nav-links {
@@ -50,8 +64,11 @@
 
 .nav-link:hover, .nav-link.active {
     color: var(--accent-yellow);
-    background: rgba(255, 107, 53, 0.1);
+    background: rgba(255, 107, 53, 0.15);
     border-color: var(--accent-orange);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,215,0,0.2);
+    text-shadow: 0 0 8px var(--accent-yellow);
 }
 
 .user-menu {
@@ -74,8 +91,14 @@
 }
 
 .user-avatar-nav:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(255, 107, 53, 0.4);
+    transform: scale(1.15) rotate(10deg);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5), 0 0 25px rgba(255,215,0,0.3);
+    animation: avatarBounce 0.6s ease-out;
+}
+
+@keyframes avatarBounce {
+    0%, 100% { transform: scale(1.15) rotate(10deg); }
+    50% { transform: scale(1.2) rotate(15deg); }
 }
 
 /* Mobile Navigation */
@@ -166,8 +189,31 @@
 .skeleton {
     background: linear-gradient(90deg, var(--charcoal) 25%, var(--dark-gray) 50%, var(--charcoal) 75%);
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
-    border-radius: 4px;
+    animation: skeletonShimmer 2s infinite ease-in-out;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
+    animation: skeletonGlow 2s infinite;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@keyframes skeletonGlow {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
 
 @keyframes skeleton-loading {
@@ -203,12 +249,37 @@
     text-align: center;
     padding: 60px 20px;
     color: var(--light-gray);
+    animation: errorFadeIn 1s ease-out;
+}
+
+@keyframes errorFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .error-icon {
     font-size: 4rem;
     color: var(--warm-red);
     margin-bottom: 20px;
+    animation: errorIconPulse 2s ease-in-out infinite;
+    text-shadow: 0 0 20px rgba(205,92,92,0.5);
+}
+
+@keyframes errorIconPulse {
+    0%, 100% {
+        transform: scale(1);
+        text-shadow: 0 0 20px rgba(205,92,92,0.5);
+    }
+    50% {
+        transform: scale(1.1);
+        text-shadow: 0 0 30px rgba(205,92,92,0.8);
+    }
 }
 
 .error-title {

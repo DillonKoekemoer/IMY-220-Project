@@ -15,7 +15,7 @@ const Header = ({ currentUser, onLogout }) => {
     };
 
     const handleProfileClick = () => {
-        navigate(`/profile/${currentUser?.id || '1'}`);
+        navigate(`/profile/${currentUser?._id || 'me'}`);
     };
 
     return (
@@ -38,16 +38,16 @@ const Header = ({ currentUser, onLogout }) => {
                 <div className="nav-right">
                     <ul className="nav-links">
                         <li><Link to="/home" className="nav-link">Home</Link></li>
-                        <li><Link to={`/profile/${currentUser?.id || '1'}`} className="nav-link">Profile</Link></li>
+                        <li><Link to={`/profile/${currentUser?._id || 'me'}`} className="nav-link">Profile</Link></li>
                     </ul>
                     
-                    <img 
-                        src={TempProfilePic} 
-                        alt="Profile" 
+                    <div 
                         className="nav-profile" 
                         onClick={handleProfileClick} 
-                        title="Profile" 
-                    />
+                        title="Profile"
+                    >
+                        {currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+                    </div>
                 </div>
             </nav>
         </header>

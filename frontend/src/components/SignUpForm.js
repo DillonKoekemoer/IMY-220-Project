@@ -1,5 +1,6 @@
 // Dillon Koekemoer u23537052
 import React, { useState } from 'react';
+import { authAPI } from '../services/api';
 
 const SignUpForm = ({ onSignUp }) => {
     const [formData, setFormData] = useState({
@@ -68,29 +69,11 @@ const SignUpForm = ({ onSignUp }) => {
         setIsSubmitting(true);
         
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    username: formData.username
-                }),
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                onSignUp(data.user);
-            } else {
-                setErrors({ submit: data.message || 'Registration failed' });
-            }
+            const name = `${formData.firstName} ${formData.lastName}`;
+            const result = await authAPI.register(name, formData.email, formData.password);
+            onSignUp(result);
         } catch (error) {
-            setErrors({ submit: 'Network error. Please try again.' });
+            setErrors({ submit: error.message || 'Registration failed' });
         } finally {
             setIsSubmitting(false);
         }

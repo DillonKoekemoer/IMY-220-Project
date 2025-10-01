@@ -1,6 +1,7 @@
 // Dillon Koekemoer u23537052
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { usersAPI } from '../services/api';
 import Profile from '../components/Profile';
 import EditProfile from '../components/EditProfile';
 import ProjectList from '../components/ProjectList';
@@ -8,17 +9,33 @@ import FriendsList from '../components/FriendsList';
 import CreateProject from '../components/CreateProject';
 import '../styles/profilepage.css';
 
-const ProfilePage = ({ currentUser, onLogout }) => {
-    const { id } = useParams();
+const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('projects');
     const [isEditing, setIsEditing] = useState(false);
+    const [profileUser, setProfileUser] = useState(null);
     
-    const isOwnProfile = currentUser && String(currentUser.id) === id;
+    const id = profileId || currentUser?._id;
+    const isOwnProfile = currentUser && String(currentUser._id) === String(id);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const user = await usersAPI.getById(id);
+                setProfileUser(user);
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
+            }
+        };
+        fetchUser();
+    }, [id]);
 
     const handleProfileSave = (updatedData) => {
-        console.log('Profile updated:', updatedData);
         setIsEditing(false);
+        if (isOwnProfile && onUserUpdate) {
+            onUserUpdate({ ...currentUser, ...updatedData });
+        }
+        setProfileUser(prev => ({ ...prev, ...updatedData }));
     };
 
     const handleProjectSave = (projectData) => {
@@ -38,17 +55,20 @@ const ProfilePage = ({ currentUser, onLogout }) => {
                 
 
                 {/* Profile Component */}
-                <Profile 
-                    userId={id} 
-                    currentUser={currentUser}
-                    isOwnProfile={isOwnProfile}
-                    onEdit={() => setIsEditing(true)}
-                />
+                {profileUser && (
+                    <Profile 
+                        userId={id} 
+                        currentUser={currentUser}
+                        profileUser={profileUser}
+                        isOwnProfile={isOwnProfile}
+                        onEdit={() => setIsEditing(true)}
+                    />
+                )}
                 
                 {/* Edit Profile Modal */}
-                {isEditing && isOwnProfile && (
+                {isEditing && isOwnProfile && profileUser && (
                     <EditProfile 
-                        user={currentUser}
+                        user={profileUser}
                         onClose={() => setIsEditing(false)}
                         onSave={handleProfileSave}
                     />
@@ -140,11 +160,17 @@ const ProfilePage = ({ currentUser, onLogout }) => {
                         </div>
                     )}
                 </div>
-                 {/* Logout button - only show for own profile */}
+                {/* Profile Actions - only show for own profile */}
                 {isOwnProfile && (
-                    <div className="profile-header">
+                    <div className="profile-actions">
                         <button 
-                            className="logout-btn" 
+                            className="btn btn-secondary" 
+                            onClick={() => setIsEditing(true)}
+                        >
+                            Edit Profile
+                        </button>
+                        <button 
+                            className="btn btn-outline" 
                             onClick={handleLogoutClick}
                         >
                             Logout
