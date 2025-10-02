@@ -34,3 +34,19 @@ How to run project
 3. http://localhost:3000
 
 link to github - https://github.com/DillonKoekemoer/IMY-220-Project
+
+Deliverable 2
+
+    This deliverable was about connecting the backend to a MongoDB database to store and pull data instead
+    of using dummy data like the previous deliverable. Below is the provided information for connection to the database
+    and how it was handled.
+
+# MongoDB info #
+    Database name: Project
+    Collection name: Users, Friends, Posts, Projects, 
+    Connection string: mongodb+srv://test-user:test-password@imy220.on7r59y.mongodb.net/?retryWrites=true&w=majority&appName=IMY220';
+
+    TestLoginEmail = test@gmail.com
+    TestPassword = Test-password123
+
+
