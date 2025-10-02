@@ -104,18 +104,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
         }
     };
 
-    const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                setErrors(prev => ({ ...prev, image: 'Image must be smaller than 5MB' }));
-                return;
-            }
-            
-            console.log('Image selected:', file.name);
-            setErrors(prev => ({ ...prev, image: '' }));
-        }
-    };
+
 
     if (loading) {
         return (
@@ -135,7 +124,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg p-4">
             <div className="bg-iron-gray text-silver rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-forge-hover border-2 border-forge-orange">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-2xl font-semibold text-forge-yellow">⚒️ Reforge Project</h3>
+                    <h3 className="text-2xl font-semibold text-forge-yellow">Reforge Project</h3>
                     <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                 </div>
                 
@@ -243,22 +232,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                         </div>
                     </div>
 
-                    <div>
-                        <label htmlFor="projectImage" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
-                            Project Image
-                        </label>
-                        <input
-                            type="file"
-                            id="projectImage"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="w-full px-4 py-3 rounded-lg bg-iron-light text-silver border border-ash-gray focus:border-forge-orange focus:ring-4 focus:ring-forge-orange/20 focus:outline-none transition-all duration-300 min-h-[44px] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-forge-orange file:text-white file:font-medium hover:file:bg-forge-red"
-                        />
-                        {errors.image && <div className="text-forge-red font-medium text-sm mt-1">{errors.image}</div>}
-                        <div className="text-xs text-ash-gray mt-1">
-                            Maximum file size: 5MB. Supported formats: JPG, PNG, GIF, WebP
-                        </div>
-                    </div>
+
 
                     {errors.submit && <div className="text-forge-red font-medium text-sm text-center">{errors.submit}</div>}
 
@@ -267,7 +241,7 @@ const EditProject = ({ projectId, onClose, onSave }) => {
                             type="submit" 
                             className="flex-1 px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95"
                         >
-                            ✨ Save Changes
+Save Changes
                         </button>
                         <button 
                             type="button" 

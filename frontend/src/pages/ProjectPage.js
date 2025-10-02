@@ -55,7 +55,7 @@ const ProjectPage = ({ currentUser }) => {
                         }`}
                         onClick={() => setActiveTab('collaborators')}
                     >
-                        👥 Collaborators
+                        Collaborators
                     </button>
                     <button 
                         className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 ${

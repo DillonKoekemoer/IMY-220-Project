@@ -110,7 +110,7 @@ const ProjectFeed = ({ type, currentUser, searchTerm, sortBy, selectedLanguage }
                 </div>
             ) : (
                 <div className="bg-iron-light text-silver rounded-xl shadow-forge p-8 border-2 border-steel-blue text-center">
-                    <div className="text-4xl mb-4">📁</div>
+
                     <h3 className="text-xl font-semibold mb-2 text-forge-yellow">No projects found</h3>
                     <p className="text-ash-gray">{type === 'global' ? 'No projects available yet!' : 'Follow some friends to see their projects!'}</p>
                 </div>

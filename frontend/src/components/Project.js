@@ -76,7 +76,7 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-3xl lg:text-4xl font-display font-bold text-forge-yellow mb-2">{project.name}</h2>
+              <h2 className="text-3xl lg:text-4xl font-sans font-bold text-forge-yellow mb-2">{project.name}</h2>
               <div className="text-forge-orange font-semibold text-sm">
                 Version {project.version}
               </div>
@@ -144,13 +144,13 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
                   className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-forge-orange border-2 border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white hover:-translate-y-0.5"
                   onClick={onEdit}
                 >
-                  ✏️ Edit Project
+Edit Project
                 </button>
                 <button 
                   className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-red-400 border-2 border-red-400 transition-all duration-300 hover:bg-red-500 hover:text-white hover:-translate-y-0.5"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
-                  🗑️ Delete Project
+Delete Project
                 </button>
               </>
             )}
@@ -159,7 +159,7 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
                 className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-ash-gray border border-ash-gray transition-all duration-300 hover:bg-iron-light hover:border-forge-orange hover:text-forge-orange"
                 onClick={() => navigate(`/profile/${projectAuthor._id}`)}
               >
-                👤 View Author
+View Author
               </button>
             )}
           </div>
@@ -170,7 +170,7 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg p-4">
           <div className="bg-iron-gray text-silver rounded-xl p-8 max-w-md w-full shadow-forge-hover border-2 border-red-500">
-            <h3 className="text-xl font-semibold text-red-400 mb-4">⚠️ Delete Project</h3>
+            <h3 className="text-xl font-semibold text-red-400 mb-4">Delete Project</h3>
             <p className="text-ash-gray mb-6">Are you sure you want to delete "{project.name}"? This action cannot be undone.</p>
             <div className="flex gap-4">
               <button 

@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     "./frontend/src/**/*.{js,jsx}",
@@ -7,7 +7,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // CodeForge color palette
         'forge-orange': '#FF6B35',
         'forge-red': '#E63946',
         'forge-yellow': '#FFD60A',
@@ -29,9 +28,10 @@ module.exports = {
         'light-gray': '#A8DADC',
       },
       fontFamily: {
-        'display': ['Fredoka One', 'sans-serif'],
-        'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
-        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'display': ['Poppins'],
+        'heading': ['Cinzel', 'serif'],
+        'mono': ['JetBrains Mono'],
+        'sans': ['Inter'],
       },
       boxShadow: {
         'forge': '0 4px 16px rgba(0,0,0,0.3)',

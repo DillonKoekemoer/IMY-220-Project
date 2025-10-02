@@ -4,15 +4,17 @@ FROM node:latest
 WORKDIR /app
 
 COPY package*.json ./
+RUN npm install
 
-RUN npm install 
+COPY backend/package*.json ./backend/
+RUN cd backend && npm install
 
 COPY . .
 
+RUN cd backend && npm rebuild bcrypt --build-from-source
+
 RUN npm run build
 
-EXPOSE 3000
-
-ENV NODE_ENV=production
+EXPOSE 3001
 
 CMD ["node", "backend/server.js"]

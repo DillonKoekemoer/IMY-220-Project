@@ -1,5 +1,7 @@
 // Dillon Koekemoer u23537052
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = {
     entry: './frontend/src/index.js',
     output: {
@@ -8,6 +10,12 @@ module.exports = {
         publicPath: '/',
     },
     mode: 'development',
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: './public/index.html',
+            filename: 'index.html',
+        }),
+    ],
     module: {
         rules: [
             {

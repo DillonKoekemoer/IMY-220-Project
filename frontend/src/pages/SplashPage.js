@@ -18,7 +18,7 @@ const SplashPage = ({ onLogin }) => {
                             alt="CodeForge Logo" 
                             className="w-48 h-auto" 
                         />
-                        <h1 className="text-5xl lg:text-6xl font-display font-bold text-forge-yellow">
+                        <h1 className="text-5xl lg:text-6xl font-sans font-bold text-forge-yellow">
                             CodeForge
                         </h1>
                     </div>
@@ -52,7 +52,7 @@ const SplashPage = ({ onLogin }) => {
                 <div className="bg-gradient-steel p-8 rounded-xl shadow-forge border-2 border-forge-orange animate-modal-slide-in relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-fire rounded-t-xl"></div>
                     <div className="text-center mb-8">
-                        <h3 className="text-2xl font-display font-semibold text-forge-yellow">Enter the Forge</h3>
+                        <h3 className="text-2xl font-sans font-semibold text-forge-yellow">Enter the Forge</h3>
                     </div>
                     
                     <div className="flex gap-2 mb-8 justify-center bg-iron-light p-1 rounded-lg">

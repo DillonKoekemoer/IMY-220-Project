@@ -3,10 +3,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ProjectPreview = ({ project }) => {
-  const getStatusIcon = (status) => {
-    return status === 'active' ? '✅' : '🛠️';
-  };
-
   const getStatusText = (status) => {
     return status === 'active' ? 'Active' : 'Inactive';
   };
@@ -21,7 +17,7 @@ const ProjectPreview = ({ project }) => {
     <article className="bg-iron-light text-silver rounded-xl shadow-forge p-6 border-2 border-steel-blue transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-2 hover:border-forge-orange hover:bg-iron-gray animate-fade-in-up h-full flex flex-col">
       <div className="mb-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-forge-yellow hover:text-forge-orange transition-colors leading-tight">
+          <h3 className="text-xl font-sans font-bold text-forge-yellow hover:text-forge-orange transition-colors leading-tight">
             <Link to={`/project/${project._id}`}>
               {project.name}
             </Link>
@@ -67,7 +63,6 @@ const ProjectPreview = ({ project }) => {
           className="w-full px-6 py-3 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
           aria-label={`View details for ${project.name}`}
         >
-          <span aria-hidden="true">🚀</span>
           View Project
         </Link>
       </div>

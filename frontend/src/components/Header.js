@@ -22,7 +22,7 @@ const Header = ({ currentUser, onLogout }) => {
         <header className="bg-gradient-to-r from-steel-dark to-iron-light shadow-forge sticky top-0 z-50 border-b-2 border-forge-orange backdrop-blur-lg animate-slide-down">
             <nav className="flex justify-between items-center py-6 px-8 max-w-6xl mx-auto min-h-[80px]">
                 <div className="flex items-center gap-4">
-                    <Link to="/" className="flex items-center gap-2 text-silver text-2xl font-display font-bold transition-all duration-300 hover:text-forge-yellow hover:scale-105">
+                    <Link to="/" className="flex items-center gap-2 text-silver text-2xl font-sans font-bold transition-all duration-300 hover:text-forge-yellow hover:scale-105">
                         <img
                             src={LogoImage} 
                             alt="CodeForge Logo"

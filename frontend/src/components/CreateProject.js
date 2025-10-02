@@ -271,7 +271,7 @@ const CreateProject = ({ onClose, onSave, isModal = true, currentUser }) => {
                         className="flex-1 px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? '⚡ Creating...' : '🚀 Create Project'}
+                        {isSubmitting ? 'Creating...' : 'Create Project'}
                     </button>
                     {isModal && (
                         <button 
