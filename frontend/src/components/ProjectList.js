@@ -58,20 +58,10 @@ const ProjectList = ({ userId, isOwnProfile }) => {
   return (
     <section>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <h3 className="text-2xl font-semibold text-forge-yellow">🚀 {isOwnProfile ? 'My Projects' : 'Projects'}</h3>
-        <div className="flex gap-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-forge-orange">{projects.length}</div>
-            <div className="text-xs text-ash-gray uppercase tracking-wide">Total</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-400">{activeProjects.length}</div>
-            <div className="text-xs text-ash-gray uppercase tracking-wide">Active</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-400">{inactiveProjects.length}</div>
-            <div className="text-xs text-ash-gray uppercase tracking-wide">Inactive</div>
-          </div>
+        <h3 className="text-2xl font-semibold text-forge-yellow">{isOwnProfile ? 'My Projects' : 'Projects'}</h3>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-forge-orange">{projects.length}</div>
+          <div className="text-xs text-ash-gray uppercase tracking-wide">Total Projects</div>
         </div>
       </div>
 
@@ -83,7 +73,7 @@ const ProjectList = ({ userId, isOwnProfile }) => {
 
       {projects.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔨</div>
+
           <h4 className="text-xl font-semibold text-silver mb-2">No Projects Yet</h4>
           <p className="text-ash-gray">{isOwnProfile ? 'Start forging your first project to see it here!' : 'This user hasn\'t created any projects yet.'}</p>
         </div>

@@ -81,7 +81,7 @@ const EditProfile = ({ user, onClose, onSave }) => {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-lg p-4">
             <div className="bg-iron-gray text-silver rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-forge-hover border-2 border-forge-orange">
                 <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-2xl font-semibold text-forge-yellow">✏️ Edit Profile</h3>
+                    <h3 className="text-2xl font-semibold text-forge-yellow">Edit Profile</h3>
                     <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -204,7 +204,7 @@ const EditProfile = ({ user, onClose, onSave }) => {
                             className="flex-1 px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? '⏳ Saving...' : '✨ Save Changes'}
+                            {isSubmitting ? 'Saving...' : 'Save Changes'}
                         </button>
                         <button 
                             type="button" 

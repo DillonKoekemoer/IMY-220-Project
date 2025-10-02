@@ -61,7 +61,7 @@ const ActivitySidebar = ({ type, currentUser }) => {
     if (loading) {
         return (
             <div className="bg-gradient-steel text-silver rounded-xl p-6 shadow-forge border-2 border-steel-blue">
-                <h3 className="text-lg font-heading font-semibold text-forge-yellow mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-sans font-semibold text-forge-yellow mb-4">Recent Activity</h3>
                 <div className="text-center text-ash-gray">Loading...</div>
             </div>
         );
@@ -69,7 +69,7 @@ const ActivitySidebar = ({ type, currentUser }) => {
 
     return (
         <div className="bg-gradient-steel text-silver rounded-xl p-6 shadow-forge border-2 border-steel-blue">
-            <h3 className="text-lg font-heading font-semibold text-forge-yellow mb-4">Recent Activity</h3>
+            <h3 className="text-lg font-sans font-semibold text-forge-yellow mb-4">Recent Activity</h3>
             {activities.length > 0 ? (
                 <div className="space-y-4">
                     {activities.map(activity => {
@@ -103,7 +103,7 @@ const ActivitySidebar = ({ type, currentUser }) => {
                 </div>
             ) : (
                 <div className="text-center py-8">
-                    <div className="text-2xl mb-2">💭</div>
+
                     <p className="text-ash-gray">No recent activity</p>
                 </div>
             )}

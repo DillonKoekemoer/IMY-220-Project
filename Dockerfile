@@ -1,20 +1,24 @@
 # Dillon koekemoer u23537052
-FROM node:latest
+FROM node:18-alpine
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm install
-
 COPY backend/package*.json ./backend/
+
+# Install dependencies
+RUN npm install
 RUN cd backend && npm install
 
+# Copy source code
 COPY . .
 
-RUN cd backend && npm rebuild bcrypt --build-from-source
-
+# Build the React app
 RUN npm run build
 
-EXPOSE 3001
+# Expose port
+EXPOSE 3000
 
+# Start the backend server
 CMD ["node", "backend/server.js"]

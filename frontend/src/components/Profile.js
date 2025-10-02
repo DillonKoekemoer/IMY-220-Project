@@ -115,7 +115,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                 
                 {/* Profile Info */}
                 <div className="flex-1 text-center md:text-left">
-                    <h1 className="text-3xl md:text-4xl font-display font-bold text-forge-yellow mb-2">
+                    <h1 className="text-3xl md:text-4xl font-sans font-bold text-forge-yellow mb-2">
                         {profileData.name || `${profileData.firstName} ${profileData.lastName}`}
                     </h1>
                     <p className="text-lg text-forge-orange mb-4 font-medium">@{profileData.username}</p>
@@ -127,12 +127,12 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                     <div className="flex flex-wrap justify-center md:justify-start gap-6 mb-6 text-sm">
                         {profileData.location && (
                             <span className="flex items-center gap-2 text-steel-light">
-                                <span className="text-forge-orange">📍</span>
+                                <span className="text-forge-orange">Location:</span>
                                 {profileData.location}
                             </span>
                         )}
                         <span className="flex items-center gap-2 text-steel-light">
-                            <span className="text-forge-orange">📅</span>
+                            <span className="text-forge-orange">Joined:</span>
                             {profileData.joinDate || 'Recently joined'}
                         </span>
                     </div>
@@ -140,7 +140,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                     {profileData.website && (
                         <div className="mb-6">
                             <span className="flex items-center justify-center md:justify-start gap-2 text-steel-light">
-                                <span className="text-forge-orange">🌐</span>
+                                <span className="text-forge-orange">Website:</span>
                                 <a 
                                     href={profileData.website} 
                                     target="_blank" 
@@ -160,7 +160,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                                 className="px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95"
                                 onClick={onEdit}
                             >
-                                ✏️ Edit Profile
+Edit Profile
                             </button>
                         ) : (
                             <button 
@@ -172,7 +172,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                                 onClick={handleAddFriend}
                                 disabled={addingFriend || isFriend}
                             >
-                                {addingFriend ? '⏳ Adding...' : isFriend ? '✓ Friends' : '👥 Add Friend'}
+                                {addingFriend ? 'Adding...' : isFriend ? 'Friends' : 'Add Friend'}
                             </button>
                         )}
                     </div>

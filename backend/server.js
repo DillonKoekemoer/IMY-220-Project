@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'your-secret-key-change-in-production';
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3000;
 
 // MongoDB connection
 const uri = 'mongodb+srv://test-user:test-password@imy220.on7r59y.mongodb.net/?retryWrites=true&w=majority&appName=IMY220';
@@ -627,7 +627,7 @@ app.get('/api/projects/:projectId/collaborators', async (req, res) => {
 
 // Catch-all handler: send back React's index.html for any unknown route
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.listen(port, () => {

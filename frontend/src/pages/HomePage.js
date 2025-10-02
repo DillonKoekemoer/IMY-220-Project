@@ -29,7 +29,7 @@ const HomePage = ({ currentUser }) => {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 items-start">
                 <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-forge-orange">
                     <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
-                        <h1 className="text-2xl text-forge-yellow mb-4 font-heading font-semibold">Project Feed</h1>
+                        <h1 className="text-2xl text-forge-yellow mb-4 font-sans font-semibold">Project Feed</h1>
                         <SearchInput 
                             value={searchTerm}
                             onChange={setSearchTerm}

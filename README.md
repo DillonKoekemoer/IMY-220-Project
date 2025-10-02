@@ -29,9 +29,9 @@ How to run project
 docker build -t codeforge .
 
 2. Run the container
-    docker run --rm -p 3001:3001 codeforge
+    docker run --rm -p 3000:3000 codeforge
 
-3. http://localhost:3001
+3. http://localhost:3000
 
 link to github - https://github.com/DillonKoekemoer/IMY-220-Project
 
