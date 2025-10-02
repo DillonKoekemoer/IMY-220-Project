@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'your-secret-key-change-in-production';
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3001;
 
 // MongoDB connection
 const uri = 'mongodb+srv://test-user:test-password@imy220.on7r59y.mongodb.net/?retryWrites=true&w=majority&appName=IMY220';

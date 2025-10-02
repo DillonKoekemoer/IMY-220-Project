@@ -1,5 +1,7 @@
 // API service for backend communication
-const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:3001/api';
+const API_BASE_URL = window.location.hostname === 'localhost' && window.location.port === '3000' 
+    ? 'http://localhost:3001/api' 
+    : '/api';
 
 // Auth helpers
 const getAuthHeaders = () => {
