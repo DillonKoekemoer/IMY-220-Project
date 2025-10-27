@@ -6,6 +6,7 @@ import Profile from '../components/Profile';
 import EditProfile from '../components/EditProfile';
 import ProjectList from '../components/ProjectList';
 import FriendsList from '../components/FriendsList';
+import FriendRequests from '../components/FriendRequests';
 import CreateProject from '../components/CreateProject';
 import UserActivity from '../components/UserActivity';
 
@@ -144,7 +145,8 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                     )}
                     
                     {activeTab === 'friends' && (
-                        <div>
+                        <div className="space-y-8">
+                            {isOwnProfile && <FriendRequests userId={id} />}
                             <FriendsList userId={id} />
                         </div>
                     )}

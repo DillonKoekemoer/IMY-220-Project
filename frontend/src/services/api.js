@@ -238,13 +238,29 @@ export const projectsAPI = {
 
 // Friends API
 export const friendsAPI = {
-    addFriend: async (userId, friendId) => {
-        const response = await fetch(`${API_BASE_URL}/users/add-friend`, {
+    sendFriendRequest: async (userId, friendId) => {
+        const response = await fetch(`${API_BASE_URL}/users/send-friend-request`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, friendId })
         });
-        if (!response.ok) throw new Error('Failed to add friend');
+        if (!response.ok) throw new Error('Failed to send friend request');
+        return response.json();
+    },
+
+    acceptFriendRequest: async (userId, friendId) => {
+        const response = await fetch(`${API_BASE_URL}/users/accept-friend-request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, friendId })
+        });
+        if (!response.ok) throw new Error('Failed to accept friend request');
+        return response.json();
+    },
+
+    getFriendshipStatus: async (userId, friendId) => {
+        const response = await fetch(`${API_BASE_URL}/users/friendship-status/${userId}/${friendId}`);
+        if (!response.ok) throw new Error('Failed to get friendship status');
         return response.json();
     },
 
@@ -260,6 +276,18 @@ export const friendsAPI = {
     getFriends: async (userId) => {
         const response = await fetch(`${API_BASE_URL}/friends/${userId}`);
         if (!response.ok) throw new Error('Failed to fetch friends');
+        return response.json();
+    },
+
+    getFriendRequests: async (userId) => {
+        const response = await fetch(`${API_BASE_URL}/friend-requests/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch friend requests');
+        return response.json();
+    },
+
+    getUserProjects: async (userId) => {
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/projects`);
+        if (!response.ok) throw new Error('Failed to fetch user projects');
         return response.json();
     }
 };

@@ -218,39 +218,98 @@ app.delete('/api/users/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Add friend endpoint
-app.post('/api/users/add-friend', async (req, res) => {
+// Send friend request endpoint
+app.post('/api/users/send-friend-request', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
         
         const { userId, friendId } = req.body;
-        console.log('Adding friend:', { userId, friendId });
+        console.log('Sending friend request:', { userId, friendId });
         
-        // Check if friendship already exists
-        const existingFriend = await db.collection('Friends')
-            .findOne({ userId, friendId });
+        // Check if request already exists
+        const existingRequest = await db.collection('Friends')
+            .findOne({ $or: [{ userId, friendId }, { userId: friendId, friendId: userId }] });
             
-        if (existingFriend) {
-            return res.status(400).json({ error: 'Already friends' });
+        if (existingRequest) {
+            return res.status(400).json({ error: 'Friend request already exists or already friends' });
         }
         
-        // Add friend relationship
+        // Add friend request
         const result = await db.collection('Friends').insertOne({
+            userId,
+            friendId,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        });
+        
+        console.log('Friend request sent successfully:', result.insertedId);
+        res.status(201).json({ message: 'Friend request sent successfully', _id: result.insertedId });
+    } catch (error) {
+        console.error('Send friend request error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Accept friend request endpoint
+app.post('/api/users/accept-friend-request', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { userId, friendId } = req.body;
+        
+        const result = await db.collection('Friends').updateOne(
+            { userId: friendId, friendId: userId, status: 'pending' },
+            { $set: { status: 'accepted' } }
+        );
+        
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Friend request not found' });
+        }
+        
+        // Create reciprocal friendship
+        await db.collection('Friends').insertOne({
             userId,
             friendId,
             status: 'accepted',
             createdAt: new Date().toISOString()
         });
         
-        console.log('Friend added successfully:', result.insertedId);
-        res.status(201).json({ message: 'Friend added successfully', _id: result.insertedId });
+        res.json({ message: 'Friend request accepted' });
     } catch (error) {
-        console.error('Add friend error:', error);
+        console.error('Accept friend request error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Remove friend endpoint
+// Check friendship status endpoint
+app.get('/api/users/friendship-status/:userId/:friendId', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const { userId, friendId } = req.params;
+        
+        const friendship = await db.collection('Friends')
+            .findOne({ userId, friendId });
+            
+        const pendingRequest = await db.collection('Friends')
+            .findOne({ userId: friendId, friendId: userId, status: 'pending' });
+            
+        if (friendship && friendship.status === 'accepted') {
+            res.json({ status: 'friends' });
+        } else if (friendship && friendship.status === 'pending') {
+            res.json({ status: 'request_sent' });
+        } else if (pendingRequest) {
+            res.json({ status: 'request_received' });
+        } else {
+            res.json({ status: 'none' });
+        }
+    } catch (error) {
+        console.error('Check friendship status error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Remove friend/unfriend endpoint
 app.delete('/api/friends/:userId/:friendId', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
@@ -258,11 +317,13 @@ app.delete('/api/friends/:userId/:friendId', async (req, res) => {
         const { userId, friendId } = req.params;
         console.log('Removing friend:', { userId, friendId });
         
-        const result = await db.collection('Friends').deleteOne({ userId, friendId });
-        
-        if (result.deletedCount === 0) {
-            return res.status(404).json({ error: 'Friendship not found' });
-        }
+        // Remove both directions of friendship
+        await db.collection('Friends').deleteMany({
+            $or: [
+                { userId, friendId },
+                { userId: friendId, friendId: userId }
+            ]
+        });
         
         console.log('Friend removed successfully');
         res.json({ message: 'Friend removed successfully' });
@@ -540,6 +601,40 @@ app.get('/api/friends/:userId', async (req, res) => {
             
         res.json(friends);
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get friend requests endpoint
+app.get('/api/friend-requests/:userId', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const userId = req.params.userId;
+        const requests = await db.collection('Friends')
+            .find({ friendId: userId, status: 'pending' })
+            .toArray();
+            
+        res.json(requests);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get user's projects endpoint
+app.get('/api/users/:userId/projects', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+        
+        const userId = req.params.userId;
+        const projects = await db.collection('Projects')
+            .find({ userId })
+            .sort({ createdAt: -1 })
+            .toArray();
+            
+        res.json(projects);
+    } catch (error) {
+        console.error('User projects fetch error:', error);
         res.status(500).json({ error: error.message });
     }
 });
