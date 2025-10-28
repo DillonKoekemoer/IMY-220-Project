@@ -42,7 +42,7 @@ const SplashPage = ({ onLogin }) => {
                             The ultimate repository platform for developers
                         </div>
                         <p className="text-base text-ash-gray leading-relaxed mb-8 max-w-lg text-left">
-                            Like GitHub, but forged with fire. Host, collaborate, and deploy your code with powerful version control and team management tools.
+                            Host, collaborate, and deploy your code with powerful version control and team management tools.
                         </p>
                         
                         <div className="flex flex-col gap-6 mb-8">
@@ -159,7 +159,7 @@ const SplashPage = ({ onLogin }) => {
 
                     <div className="text-center mt-16">
                         <p className="text-lg text-forge-orange font-semibold">
-                            Join thousands of developers who have already chosen CodeForge as their development home.
+                            Join developers who have already chosen CodeForge as their development home.
                         </p>
                     </div>
                 </div>
