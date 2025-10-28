@@ -1,13 +1,34 @@
 // Dillon Koekemoer u23537052
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import LogoImage from '../assets/Logo.png'; 
-import TempProfilePic from '../assets/thething.png';
-
+import LogoImage from '../assets/Logo.png';
 
 const Header = ({ currentUser, onLogout }) => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const getProfileImageStyle = (picture) => {
+        if (!picture) {
+            return {
+                background: 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
+            };
+        }
+
+        // Check if it's a placeholder
+        if (picture.startsWith('placeholder-')) {
+            const color = picture.replace('placeholder-', '');
+            return {
+                background: `linear-gradient(135deg, #${color} 0%, #${color}dd 100%)`,
+            };
+        }
+
+        // It's an uploaded image
+        return {
+            backgroundImage: `url(http://localhost:3001${picture})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+        };
+    };
 
     const handleLogout = () => {
         onLogout();
@@ -59,12 +80,15 @@ const Header = ({ currentUser, onLogout }) => {
                         </li>
                     </ul>
                     
-                    <div 
-                        className="w-10 h-10 rounded-full bg-gradient-to-r from-forge-orange via-forge-red to-forge-yellow text-white flex items-center justify-center font-semibold cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-forge-glow border-2 border-forge-yellow text-sm"
-                        onClick={handleProfileClick} 
+                    <div
+                        className="w-10 h-10 rounded-full text-white flex items-center justify-center font-semibold cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-forge-glow border-2 border-forge-yellow text-sm overflow-hidden"
+                        style={getProfileImageStyle(currentUser?.profilePicture)}
+                        onClick={handleProfileClick}
                         title="Profile"
                     >
-                        {currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
+                        {(!currentUser?.profilePicture || currentUser?.profilePicture?.startsWith('placeholder-')) && (
+                            currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'
+                        )}
                     </div>
                 </div>
             </nav>

@@ -16,28 +16,57 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
     const [activeTab, setActiveTab] = useState('projects');
     const [isEditing, setIsEditing] = useState(false);
     const [profileUser, setProfileUser] = useState(null);
-    
+    const [friendshipStatus, setFriendshipStatus] = useState('none');
+
     const id = profileId || currentUser?._id;
     const isOwnProfile = currentUser && String(currentUser._id) === String(id);
+    const isFriend = friendshipStatus === 'friends';
+    const showFullProfile = isOwnProfile || isFriend;
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const user = await usersAPI.getById(id);
                 setProfileUser(user);
+
+                // Fetch friendship status if viewing another user's profile
+                if (!isOwnProfile && currentUser) {
+                    const { friendsAPI } = await import('../services/api');
+                    const statusData = await friendsAPI.getFriendshipStatus(currentUser._id, id);
+                    setFriendshipStatus(statusData.status);
+                }
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             }
         };
         fetchUser();
-    }, [id]);
+    }, [id, isOwnProfile, currentUser]);
 
-    const handleProfileSave = (updatedData) => {
-        setIsEditing(false);
+    const handleProfileSave = async (updatedData) => {
+        // Don't close the modal immediately if it's just a profile picture update
+        const isProfilePictureOnly = Object.keys(updatedData).length === 1 && updatedData.profilePicture;
+
+        if (!isProfilePictureOnly) {
+            setIsEditing(false);
+        }
+
         if (isOwnProfile && onUserUpdate) {
             onUserUpdate({ ...currentUser, ...updatedData });
         }
+
+        // Update local profile user state
         setProfileUser(prev => ({ ...prev, ...updatedData }));
+
+        // Refresh user data from server to ensure we have the latest
+        try {
+            const freshUserData = await usersAPI.getById(id);
+            setProfileUser(freshUserData);
+            if (isOwnProfile && onUserUpdate) {
+                onUserUpdate(freshUserData);
+            }
+        } catch (error) {
+            console.error('Failed to refresh user data:', error);
+        }
     };
 
     const handleProjectSave = (projectData) => {
@@ -88,28 +117,29 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                     />
                 )}
 
-                {/* Tab Navigation */}
-                <div className="flex gap-2 bg-gradient-metal p-2 rounded-xl shadow-forge border-2 border-steel-blue flex-wrap">
-                    <button 
-                        className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 min-w-[120px] ${
-                            activeTab === 'projects' 
-                                ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1' 
-                                : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
-                        }`}
-                        onClick={() => setActiveTab('projects')}
-                    >
-                        Projects
-                    </button>
-                    <button 
-                        className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 min-w-[120px] ${
-                            activeTab === 'friends' 
-                                ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1' 
-                                : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
-                        }`}
-                        onClick={() => setActiveTab('friends')}
-                    >
-                        Friends
-                    </button>
+                {/* Tab Navigation - Only show for own profile or friends */}
+                {showFullProfile && (
+                    <div className="flex gap-2 bg-gradient-metal p-2 rounded-xl shadow-forge border-2 border-steel-blue flex-wrap">
+                        <button
+                            className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 min-w-[120px] ${
+                                activeTab === 'projects'
+                                    ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1'
+                                    : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
+                            }`}
+                            onClick={() => setActiveTab('projects')}
+                        >
+                            Projects
+                        </button>
+                        <button
+                            className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 min-w-[120px] ${
+                                activeTab === 'friends'
+                                    ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1'
+                                    : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
+                            }`}
+                            onClick={() => setActiveTab('friends')}
+                        >
+                            Friends
+                        </button>
                     {isOwnProfile && (
                         <>
                             <button 
@@ -134,22 +164,24 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                             </button>
                         </>
                     )}
-                </div>
+                    </div>
+                )}
 
-                {/* Tab Content */}
-                <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-forge-orange">
-                    {activeTab === 'projects' && (
-                        <div>
-                            <ProjectList userId={id} isOwnProfile={isOwnProfile} />
-                        </div>
-                    )}
-                    
-                    {activeTab === 'friends' && (
-                        <div className="space-y-8">
-                            {isOwnProfile && <FriendRequests userId={id} />}
-                            <FriendsList userId={id} />
-                        </div>
-                    )}
+                {/* Tab Content - Only show for own profile or friends */}
+                {showFullProfile && (
+                    <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-forge-orange">
+                        {activeTab === 'projects' && (
+                            <div>
+                                <ProjectList userId={id} isOwnProfile={isOwnProfile} />
+                            </div>
+                        )}
+
+                        {activeTab === 'friends' && (
+                            <div className="space-y-8">
+                                {isOwnProfile && <FriendRequests userId={id} />}
+                                <FriendsList userId={id} />
+                            </div>
+                        )}
                     
                     {activeTab === 'create-project' && isOwnProfile && (
                         <div>
@@ -161,12 +193,13 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                         </div>
                     )}
                     
-                    {activeTab === 'activity' && isOwnProfile && (
-                        <div>
-                            <UserActivity userId={id} />
-                        </div>
-                    )}
-                </div>
+                        {activeTab === 'activity' && isOwnProfile && (
+                            <div>
+                                <UserActivity userId={id} />
+                            </div>
+                        )}
+                    </div>
+                )}
                 
                 {/* Profile Actions - only show for own profile */}
                 {isOwnProfile && (

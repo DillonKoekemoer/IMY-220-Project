@@ -82,6 +82,34 @@ export const usersAPI = {
         });
         if (!response.ok) throw new Error('Failed to delete user');
         return response.json();
+    },
+
+    uploadProfilePicture: async (userId, file) => {
+        const formData = new FormData();
+        formData.append('profilePicture', file);
+
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-picture`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // Note: Don't set Content-Type for FormData, browser will set it with boundary
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const text = await response.text();
+            let errorMessage = 'Failed to upload profile picture';
+            try {
+                const errorData = JSON.parse(text);
+                errorMessage = errorData.error || errorMessage;
+            } catch (e) {
+                errorMessage = text || errorMessage;
+            }
+            throw new Error(errorMessage);
+        }
+        return response.json();
     }
 };
 

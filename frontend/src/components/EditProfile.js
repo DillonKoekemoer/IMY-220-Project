@@ -1,6 +1,7 @@
 // Dillon Koekemoer u23537052
 import React, { useState } from 'react';
 import { usersAPI } from '../services/api';
+import ProfilePictureUpload from './ProfilePictureUpload';
 
 const EditProfile = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -8,11 +9,26 @@ const EditProfile = ({ user, onClose, onSave }) => {
         lastName: user?.lastName || '',
         bio: user?.bio || '',
         location: user?.location || '',
-        website: user?.website || ''
+        website: user?.website || '',
+        profilePicture: user?.profilePicture || ''
     });
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleProfilePictureUpload = async (newPicturePath) => {
+        // Update formData with new picture
+        setFormData(prev => ({ ...prev, profilePicture: newPicturePath }));
+
+        // Immediately save just the profile picture to avoid losing other changes
+        try {
+            await usersAPI.update(user._id, { profilePicture: newPicturePath });
+            // Update parent component with the new picture
+            onSave({ ...user, profilePicture: newPicturePath });
+        } catch (error) {
+            console.error('Failed to update profile picture in database:', error);
+        }
+    };
 
     const validateForm = () => {
         const newErrors = {};
@@ -85,6 +101,15 @@ const EditProfile = ({ user, onClose, onSave }) => {
                     <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Profile Picture Upload */}
+                    <div className="flex justify-center py-4 border-b border-ash-gray/30">
+                        <ProfilePictureUpload
+                            currentPicture={formData.profilePicture}
+                            userId={user?._id}
+                            onUploadSuccess={handleProfilePictureUpload}
+                        />
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="firstName" className="block text-silver font-semibold mb-2 text-sm uppercase tracking-wide">
