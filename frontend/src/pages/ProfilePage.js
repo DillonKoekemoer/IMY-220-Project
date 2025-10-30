@@ -6,7 +6,6 @@ import Profile from '../components/Profile';
 import EditProfile from '../components/EditProfile';
 import ProjectList from '../components/ProjectList';
 import FriendsList from '../components/FriendsList';
-import FriendRequests from '../components/FriendRequests';
 import CreateProject from '../components/CreateProject';
 import UserActivity from '../components/UserActivity';
 
@@ -21,51 +20,53 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
     const id = profileId || currentUser?._id;
     const isOwnProfile = currentUser && String(currentUser._id) === String(id);
     const isFriend = friendshipStatus === 'friends';
-    const showFullProfile = isOwnProfile || isFriend;
+    const canViewTabs = isOwnProfile || isFriend;
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const user = await usersAPI.getById(id);
                 setProfileUser(user);
-
-                // Fetch friendship status if viewing another user's profile
-                if (!isOwnProfile && currentUser) {
-                    const { friendsAPI } = await import('../services/api');
-                    const statusData = await friendsAPI.getFriendshipStatus(currentUser._id, id);
-                    setFriendshipStatus(statusData.status);
-                }
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             }
         };
+
+        const checkFriendshipStatus = async () => {
+            if (!id || !currentUser || isOwnProfile) return;
+
+            try {
+                const response = await fetch(`http://localhost:3001/api/users/friendship-status/${currentUser._id}/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setFriendshipStatus(data.status);
+                }
+            } catch (error) {
+                console.error('Error checking friendship status:', error);
+            }
+        };
+
         fetchUser();
-    }, [id, isOwnProfile, currentUser]);
+        checkFriendshipStatus();
+    }, [id, currentUser, isOwnProfile]);
 
     const handleProfileSave = async (updatedData) => {
-        // Don't close the modal immediately if it's just a profile picture update
-        const isProfilePictureOnly = Object.keys(updatedData).length === 1 && updatedData.profilePicture;
+        setIsEditing(false);
 
-        if (!isProfilePictureOnly) {
-            setIsEditing(false);
-        }
-
-        if (isOwnProfile && onUserUpdate) {
-            onUserUpdate({ ...currentUser, ...updatedData });
-        }
-
-        // Update local profile user state
-        setProfileUser(prev => ({ ...prev, ...updatedData }));
-
-        // Refresh user data from server to ensure we have the latest
+        // Refetch the user to get the latest data including profile picture
         try {
-            const freshUserData = await usersAPI.getById(id);
-            setProfileUser(freshUserData);
+            const user = await usersAPI.getById(id);
+            setProfileUser(user);
             if (isOwnProfile && onUserUpdate) {
-                onUserUpdate(freshUserData);
+                onUserUpdate(user);
             }
         } catch (error) {
-            console.error('Failed to refresh user data:', error);
+            console.error('Failed to fetch updated user:', error);
+            // Fallback to optimistic update if fetch fails
+            if (isOwnProfile && onUserUpdate) {
+                onUserUpdate({ ...currentUser, ...updatedData });
+            }
+            setProfileUser(prev => ({ ...prev, ...updatedData }));
         }
     };
 
@@ -117,8 +118,8 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                     />
                 )}
 
-                {/* Tab Navigation - Only show for own profile or friends */}
-                {showFullProfile && (
+                {/* Tab Navigation - Only show if own profile or friends */}
+                {canViewTabs && (
                     <div className="flex gap-2 bg-gradient-metal p-2 rounded-xl shadow-forge border-2 border-steel-blue flex-wrap">
                         <button
                             className={`flex-1 px-6 py-4 border-none bg-transparent rounded-lg font-semibold cursor-pointer transition-all duration-300 min-w-[120px] ${
@@ -167,8 +168,8 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                     </div>
                 )}
 
-                {/* Tab Content - Only show for own profile or friends */}
-                {showFullProfile && (
+                {/* Tab Content - Only show if own profile or friends */}
+                {canViewTabs && (
                     <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-forge-orange">
                         {activeTab === 'projects' && (
                             <div>
@@ -177,27 +178,37 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
                         )}
 
                         {activeTab === 'friends' && (
-                            <div className="space-y-8">
-                                {isOwnProfile && <FriendRequests userId={id} />}
+                            <div>
                                 <FriendsList userId={id} />
                             </div>
                         )}
-                    
-                    {activeTab === 'create-project' && isOwnProfile && (
-                        <div>
-                            <CreateProject 
-                                onSave={handleProjectSave}
-                                isModal={false}
-                                currentUser={currentUser}
-                            />
-                        </div>
-                    )}
-                    
+
+                        {activeTab === 'create-project' && isOwnProfile && (
+                            <div>
+                                <CreateProject
+                                    onSave={handleProjectSave}
+                                    isModal={false}
+                                    currentUser={currentUser}
+                                />
+                            </div>
+                        )}
+
                         {activeTab === 'activity' && isOwnProfile && (
                             <div>
                                 <UserActivity userId={id} />
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* Not friends message */}
+                {!canViewTabs && (
+                    <div className="bg-gradient-steel text-silver rounded-xl p-12 shadow-forge border-2 border-ash-gray text-center">
+                        <div className="text-6xl mb-4">🔒</div>
+                        <h3 className="text-2xl font-semibold text-forge-yellow mb-3">Profile Access Restricted</h3>
+                        <p className="text-ash-gray max-w-md mx-auto">
+                            Add {profileUser?.name?.split(' ')[0] || 'this user'} as a friend to view their projects and friends list.
+                        </p>
                     </div>
                 )}
                 

@@ -1,7 +1,6 @@
 // Dillon Koekemoer u23537052
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { usersAPI } from '../services/api';
-import ProfilePictureUpload from './ProfilePictureUpload';
 
 const EditProfile = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -9,26 +8,16 @@ const EditProfile = ({ user, onClose, onSave }) => {
         lastName: user?.lastName || '',
         bio: user?.bio || '',
         location: user?.location || '',
-        website: user?.website || '',
-        profilePicture: user?.profilePicture || ''
+        website: user?.website || ''
     });
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleProfilePictureUpload = async (newPicturePath) => {
-        // Update formData with new picture
-        setFormData(prev => ({ ...prev, profilePicture: newPicturePath }));
-
-        // Immediately save just the profile picture to avoid losing other changes
-        try {
-            await usersAPI.update(user._id, { profilePicture: newPicturePath });
-            // Update parent component with the new picture
-            onSave({ ...user, profilePicture: newPicturePath });
-        } catch (error) {
-            console.error('Failed to update profile picture in database:', error);
-        }
-    };
+    const [profilePicture, setProfilePicture] = useState(user?.profilePicture || null);
+    const [profilePicturePreview, setProfilePicturePreview] = useState(user?.profilePicture || null);
+    const [uploadingPicture, setUploadingPicture] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef(null);
 
     const validateForm = () => {
         const newErrors = {};
@@ -87,9 +76,100 @@ const EditProfile = ({ user, onClose, onSave }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        
+
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const uploadProfilePicture = async (file) => {
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image must be less than 5MB');
+            return;
+        }
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfilePicturePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // Upload immediately
+        setUploadingPicture(true);
+        const formData = new FormData();
+        formData.append('profilePicture', file);
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:3001/api/users/${user._id}/profile-picture`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload profile picture');
+            }
+
+            const data = await response.json();
+            setProfilePicture(data.profilePicture);
+            alert('Profile picture updated successfully!');
+
+            // Trigger the save callback to refresh the profile
+            if (onSave) {
+                onSave({ profilePicture: data.profilePicture });
+            }
+        } catch (error) {
+            console.error('Error uploading profile picture:', error);
+            alert('Failed to upload profile picture. Please try again.');
+            setProfilePicturePreview(user?.profilePicture || null);
+        } finally {
+            setUploadingPicture(false);
+        }
+    };
+
+    const handleProfilePictureChange = async (e) => {
+        const file = e.target.files[0];
+        await uploadProfilePicture(file);
+    };
+
+    const handleDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            await uploadProfilePicture(files[0]);
         }
     };
 
@@ -101,13 +181,71 @@ const EditProfile = ({ user, onClose, onSave }) => {
                     <button className="text-2xl text-ash-gray hover:text-forge-red transition-colors" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Profile Picture Upload */}
-                    <div className="flex justify-center py-4 border-b border-ash-gray/30">
-                        <ProfilePictureUpload
-                            currentPicture={formData.profilePicture}
-                            userId={user?._id}
-                            onUploadSuccess={handleProfilePictureUpload}
+                    {/* Profile Picture Section */}
+                    <div className="flex flex-col items-center mb-6">
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleProfilePictureChange}
+                            style={{ display: 'none' }}
                         />
+                        <div
+                            className={`relative mb-4 transition-all duration-300 ${
+                                isDragging ? 'scale-110' : ''
+                            }`}
+                            onDragEnter={handleDragEnter}
+                            onDragLeave={handleDragLeave}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                        >
+                            <div className={`w-32 h-32 rounded-full overflow-hidden border-4 shadow-forge transition-all duration-300 ${
+                                isDragging ? 'border-forge-yellow shadow-forge-hover' : 'border-forge-orange'
+                            }`}>
+                                {profilePicturePreview ? (
+                                    profilePicturePreview.startsWith('placeholder-') ? (
+                                        <div
+                                            className="w-full h-full flex items-center justify-center text-4xl font-bold text-white"
+                                            style={{ backgroundColor: `#${profilePicturePreview.replace('placeholder-', '')}` }}
+                                        >
+                                            {user?.name?.charAt(0).toUpperCase() || '?'}
+                                        </div>
+                                    ) : (
+                                        <img
+                                            src={profilePicturePreview.startsWith('http') ? profilePicturePreview : `http://localhost:3001${profilePicturePreview}`}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    )
+                                ) : (
+                                    <div className="w-full h-full bg-iron-light flex items-center justify-center text-4xl text-ash-gray">
+                                        {user?.name?.charAt(0).toUpperCase() || '?'}
+                                    </div>
+                                )}
+                            </div>
+                            {uploadingPicture && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                                    <div className="text-white text-sm">Uploading...</div>
+                                </div>
+                            )}
+                            {isDragging && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-forge-yellow/20 rounded-full border-4 border-forge-yellow border-dashed">
+                                    <div className="text-forge-yellow text-sm font-bold">Drop Here!</div>
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploadingPicture}
+                            className="px-6 py-2 rounded-lg font-medium bg-gradient-fire text-white shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {uploadingPicture ? 'Uploading...' : 'Change Profile Picture'}
+                        </button>
+                        <p className="text-xs text-ash-gray mt-2">
+                            Click or <span className="text-forge-orange font-semibold">drag & drop</span> to upload
+                        </p>
+                        <p className="text-xs text-steel-light">Max size: 5MB • Formats: JPG, PNG, GIF</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

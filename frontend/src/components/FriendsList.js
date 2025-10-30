@@ -17,8 +17,6 @@ const FriendsList = ({ userId }) => {
         e.stopPropagation();
         if (removingFriend === friendId) return;
         
-        if (!confirm('Are you sure you want to unfriend this user?')) return;
-        
         setRemovingFriend(friendId);
         try {
             await friendsAPI.removeFriend(userId, friendId);

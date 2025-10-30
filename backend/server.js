@@ -110,7 +110,7 @@ app.use(express.json());
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);
@@ -120,21 +120,6 @@ app.use((req, res, next) => {
 });
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
-
-// Helper function to generate placeholder profile picture
-const getRandomPlaceholderImage = (seed) => {
-    const colors = [
-        'FF6B35', 'F7931E', 'FDC830', '37B9F1', '4ECDC4',
-        'E63946', 'A8DADC', 'F4A261', 'E76F51', '2A9D8F',
-        '264653', 'E9C46A', 'F77F00', '06D6A0', '118AB2'
-    ];
-
-    // Use seed to consistently select a color
-    const colorIndex = seed ? parseInt(seed.toString().substring(0, 8), 16) % colors.length : Math.floor(Math.random() * colors.length);
-    const bgColor = colors[colorIndex];
-
-    return `placeholder-${bgColor}`;
-};
 
 // Auth middleware
 const authenticateToken = (req, res, next) => {
@@ -184,20 +169,7 @@ app.post('/api/login', async (req, res) => {
         const userId = user._id.toString();
         const token = jwt.sign({ userId, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
         console.log('Login - Generated token for user:', { userId, email: user.email });
-        res.json({
-            token,
-            user: {
-                _id: userId,
-                name: user.name,
-                email: user.email,
-                profilePicture: user.profilePicture,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                bio: user.bio,
-                location: user.location,
-                website: user.website
-            }
-        });
+        res.json({ token, user: { _id: userId, name: user.name, email: user.email } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: error.message });
@@ -223,28 +195,14 @@ app.post('/api/register', async (req, res) => {
             lastName: lastName || '',
             bio: '',
             location: '',
-            website: '',
-            profilePicture: getRandomPlaceholderImage(email)
+            website: ''
         };
         const result = await db.collection('Users').insertOne(userData);
         const userId = result.insertedId.toString();
         console.log('New user created with ID:', userId);
-
+        
         const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({
-            token,
-            user: {
-                _id: userId,
-                name,
-                email,
-                profilePicture: userData.profilePicture,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                bio: userData.bio,
-                location: userData.location,
-                website: userData.website
-            }
-        });
+        res.status(201).json({ token, user: { _id: userId, name, email } });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -359,7 +317,7 @@ app.post('/api/users/:id/profile-picture', authenticateToken, uploadProfilePictu
 
         // Get the old profile picture to delete it
         const user = await db.collection('Users').findOne({ _id: new ObjectId(userId) });
-        if (user && user.profilePicture && !user.profilePicture.startsWith('placeholder-')) {
+        if (user && user.profilePicture && !user.profilePicture.startsWith('placeholder-') && user.profilePicture.startsWith('/uploads')) {
             const oldPicturePath = path.join(__dirname, '../public', user.profilePicture);
             if (fs.existsSync(oldPicturePath)) {
                 fs.unlinkSync(oldPicturePath);
@@ -402,98 +360,39 @@ app.delete('/api/users/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Send friend request endpoint
-app.post('/api/users/send-friend-request', async (req, res) => {
+// Add friend endpoint
+app.post('/api/users/add-friend', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
         
         const { userId, friendId } = req.body;
-        console.log('Sending friend request:', { userId, friendId });
+        console.log('Adding friend:', { userId, friendId });
         
-        // Check if request already exists
-        const existingRequest = await db.collection('Friends')
-            .findOne({ $or: [{ userId, friendId }, { userId: friendId, friendId: userId }] });
+        // Check if friendship already exists
+        const existingFriend = await db.collection('Friends')
+            .findOne({ userId, friendId });
             
-        if (existingRequest) {
-            return res.status(400).json({ error: 'Friend request already exists or already friends' });
+        if (existingFriend) {
+            return res.status(400).json({ error: 'Already friends' });
         }
         
-        // Add friend request
+        // Add friend relationship
         const result = await db.collection('Friends').insertOne({
-            userId,
-            friendId,
-            status: 'pending',
-            createdAt: new Date().toISOString()
-        });
-        
-        console.log('Friend request sent successfully:', result.insertedId);
-        res.status(201).json({ message: 'Friend request sent successfully', _id: result.insertedId });
-    } catch (error) {
-        console.error('Send friend request error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Accept friend request endpoint
-app.post('/api/users/accept-friend-request', async (req, res) => {
-    try {
-        if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
-        const { userId, friendId } = req.body;
-        
-        const result = await db.collection('Friends').updateOne(
-            { userId: friendId, friendId: userId, status: 'pending' },
-            { $set: { status: 'accepted' } }
-        );
-        
-        if (result.matchedCount === 0) {
-            return res.status(404).json({ error: 'Friend request not found' });
-        }
-        
-        // Create reciprocal friendship
-        await db.collection('Friends').insertOne({
             userId,
             friendId,
             status: 'accepted',
             createdAt: new Date().toISOString()
         });
         
-        res.json({ message: 'Friend request accepted' });
+        console.log('Friend added successfully:', result.insertedId);
+        res.status(201).json({ message: 'Friend added successfully', _id: result.insertedId });
     } catch (error) {
-        console.error('Accept friend request error:', error);
+        console.error('Add friend error:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
-// Check friendship status endpoint
-app.get('/api/users/friendship-status/:userId/:friendId', async (req, res) => {
-    try {
-        if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
-        const { userId, friendId } = req.params;
-        
-        const friendship = await db.collection('Friends')
-            .findOne({ userId, friendId });
-            
-        const pendingRequest = await db.collection('Friends')
-            .findOne({ userId: friendId, friendId: userId, status: 'pending' });
-            
-        if (friendship && friendship.status === 'accepted') {
-            res.json({ status: 'friends' });
-        } else if (friendship && friendship.status === 'pending') {
-            res.json({ status: 'request_sent' });
-        } else if (pendingRequest) {
-            res.json({ status: 'request_received' });
-        } else {
-            res.json({ status: 'none' });
-        }
-    } catch (error) {
-        console.error('Check friendship status error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Remove friend/unfriend endpoint
+// Remove friend endpoint
 app.delete('/api/friends/:userId/:friendId', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
@@ -501,13 +400,11 @@ app.delete('/api/friends/:userId/:friendId', async (req, res) => {
         const { userId, friendId } = req.params;
         console.log('Removing friend:', { userId, friendId });
         
-        // Remove both directions of friendship
-        await db.collection('Friends').deleteMany({
-            $or: [
-                { userId, friendId },
-                { userId: friendId, friendId: userId }
-            ]
-        });
+        const result = await db.collection('Friends').deleteOne({ userId, friendId });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Friendship not found' });
+        }
         
         console.log('Friend removed successfully');
         res.json({ message: 'Friend removed successfully' });
@@ -1042,30 +939,214 @@ app.get('/api/feed/local/:userId', async (req, res) => {
 app.get('/api/friends/:userId', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
+
         const userId = req.params.userId;
         const friends = await db.collection('Friends')
             .find({ userId, status: 'accepted' })
             .toArray();
-            
+
         res.json(friends);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Get friend requests endpoint
-app.get('/api/friend-requests/:userId', async (req, res) => {
+// Get friendship status between two users
+app.get('/api/users/friendship-status/:userId/:friendId', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
-        const userId = req.params.userId;
+
+        const { userId, friendId } = req.params;
+
+        // Check if they're friends (accepted)
+        const friendship = await db.collection('Friends').findOne({
+            $or: [
+                { userId, friendId, status: 'accepted' },
+                { userId: friendId, friendId: userId, status: 'accepted' }
+            ]
+        });
+
+        if (friendship) {
+            return res.json({ status: 'friends' });
+        }
+
+        // Check if there's a pending request from userId to friendId
+        const sentRequest = await db.collection('Friends').findOne({
+            userId,
+            friendId,
+            status: 'pending'
+        });
+
+        if (sentRequest) {
+            return res.json({ status: 'request_sent' });
+        }
+
+        // Check if there's a pending request from friendId to userId
+        const receivedRequest = await db.collection('Friends').findOne({
+            userId: friendId,
+            friendId: userId,
+            status: 'pending'
+        });
+
+        if (receivedRequest) {
+            return res.json({ status: 'request_received' });
+        }
+
+        // No relationship
+        res.json({ status: 'none' });
+    } catch (error) {
+        console.error('Friendship status check error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Send friend request
+app.post('/api/users/send-friend-request', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { userId, friendId } = req.body;
+
+        if (!userId || !friendId) {
+            return res.status(400).json({ error: 'userId and friendId are required' });
+        }
+
+        if (userId === friendId) {
+            return res.status(400).json({ error: 'Cannot send friend request to yourself' });
+        }
+
+        // Check if they're already friends
+        const existing = await db.collection('Friends').findOne({
+            $or: [
+                { userId, friendId },
+                { userId: friendId, friendId: userId }
+            ]
+        });
+
+        if (existing) {
+            if (existing.status === 'accepted') {
+                return res.status(400).json({ error: 'Already friends' });
+            } else if (existing.status === 'pending') {
+                return res.status(400).json({ error: 'Friend request already sent' });
+            }
+        }
+
+        // Create friend request
+        const friendRequest = {
+            userId,
+            friendId,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+        };
+
+        await db.collection('Friends').insertOne(friendRequest);
+        res.json({ message: 'Friend request sent successfully' });
+    } catch (error) {
+        console.error('Send friend request error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get pending friend requests for a user
+app.get('/api/users/:userId/friend-requests', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { userId } = req.params;
+
+        // Get all pending requests where this user is the friendId (received requests)
         const requests = await db.collection('Friends')
             .find({ friendId: userId, status: 'pending' })
             .toArray();
-            
-        res.json(requests);
+
+        // Get user details for each request sender
+        const requestsWithUserData = await Promise.all(
+            requests.map(async (request) => {
+                const user = await db.collection('Users').findOne({ _id: new ObjectId(request.userId) });
+                return {
+                    ...request,
+                    user: user ? {
+                        _id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        profilePicture: user.profilePicture
+                    } : null
+                };
+            })
+        );
+
+        res.json(requestsWithUserData);
     } catch (error) {
+        console.error('Get friend requests error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Accept friend request
+app.post('/api/users/accept-friend-request', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { userId, friendId } = req.body;
+
+        if (!userId || !friendId) {
+            return res.status(400).json({ error: 'userId and friendId are required' });
+        }
+
+        // Find the pending request
+        const request = await db.collection('Friends').findOne({
+            userId: friendId,
+            friendId: userId,
+            status: 'pending'
+        });
+
+        if (!request) {
+            return res.status(404).json({ error: 'Friend request not found' });
+        }
+
+        // Update the request status to accepted
+        await db.collection('Friends').updateOne(
+            { _id: request._id },
+            {
+                $set: {
+                    status: 'accepted',
+                    acceptedAt: new Date().toISOString()
+                }
+            }
+        );
+
+        res.json({ message: 'Friend request accepted' });
+    } catch (error) {
+        console.error('Accept friend request error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Reject friend request
+app.post('/api/users/reject-friend-request', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { userId, friendId } = req.body;
+
+        if (!userId || !friendId) {
+            return res.status(400).json({ error: 'userId and friendId are required' });
+        }
+
+        // Find and delete the pending request
+        const result = await db.collection('Friends').deleteOne({
+            userId: friendId,
+            friendId: userId,
+            status: 'pending'
+        });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Friend request not found' });
+        }
+
+        res.json({ message: 'Friend request rejected' });
+    } catch (error) {
+        console.error('Reject friend request error:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -1074,13 +1155,13 @@ app.get('/api/friend-requests/:userId', async (req, res) => {
 app.get('/api/users/:userId/projects', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
+
         const userId = req.params.userId;
         const projects = await db.collection('Projects')
             .find({ userId })
             .sort({ createdAt: -1 })
             .toArray();
-            
+
         res.json(projects);
     } catch (error) {
         console.error('User projects fetch error:', error);

@@ -82,34 +82,6 @@ export const usersAPI = {
         });
         if (!response.ok) throw new Error('Failed to delete user');
         return response.json();
-    },
-
-    uploadProfilePicture: async (userId, file) => {
-        const formData = new FormData();
-        formData.append('profilePicture', file);
-
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/profile-picture`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-                // Note: Don't set Content-Type for FormData, browser will set it with boundary
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            const text = await response.text();
-            let errorMessage = 'Failed to upload profile picture';
-            try {
-                const errorData = JSON.parse(text);
-                errorMessage = errorData.error || errorMessage;
-            } catch (e) {
-                errorMessage = text || errorMessage;
-            }
-            throw new Error(errorMessage);
-        }
-        return response.json();
     }
 };
 
@@ -266,29 +238,13 @@ export const projectsAPI = {
 
 // Friends API
 export const friendsAPI = {
-    sendFriendRequest: async (userId, friendId) => {
-        const response = await fetch(`${API_BASE_URL}/users/send-friend-request`, {
+    addFriend: async (userId, friendId) => {
+        const response = await fetch(`${API_BASE_URL}/users/add-friend`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, friendId })
         });
-        if (!response.ok) throw new Error('Failed to send friend request');
-        return response.json();
-    },
-
-    acceptFriendRequest: async (userId, friendId) => {
-        const response = await fetch(`${API_BASE_URL}/users/accept-friend-request`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, friendId })
-        });
-        if (!response.ok) throw new Error('Failed to accept friend request');
-        return response.json();
-    },
-
-    getFriendshipStatus: async (userId, friendId) => {
-        const response = await fetch(`${API_BASE_URL}/users/friendship-status/${userId}/${friendId}`);
-        if (!response.ok) throw new Error('Failed to get friendship status');
+        if (!response.ok) throw new Error('Failed to add friend');
         return response.json();
     },
 
@@ -304,18 +260,6 @@ export const friendsAPI = {
     getFriends: async (userId) => {
         const response = await fetch(`${API_BASE_URL}/friends/${userId}`);
         if (!response.ok) throw new Error('Failed to fetch friends');
-        return response.json();
-    },
-
-    getFriendRequests: async (userId) => {
-        const response = await fetch(`${API_BASE_URL}/friend-requests/${userId}`);
-        if (!response.ok) throw new Error('Failed to fetch friend requests');
-        return response.json();
-    },
-
-    getUserProjects: async (userId) => {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/projects`);
-        if (!response.ok) throw new Error('Failed to fetch user projects');
         return response.json();
     }
 };
