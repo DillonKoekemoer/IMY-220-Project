@@ -1,14 +1,13 @@
 // Dillon Koekemoer u23537052
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import TempProfilePic from '../assets/thething.png';
 import { usersAPI } from '../services/api';
 
 const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [friendshipStatus, setFriendshipStatus] = useState('none'); // 'none', 'friends', 'request_sent', 'request_received'
+    const [friendshipStatus, setFriendshipStatus] = useState('none'); 
     const [processingRequest, setProcessingRequest] = useState(false);
 
     useEffect(() => {
@@ -20,7 +19,6 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                 const data = await usersAPI.getById(userId);
                 setProfileData({
                     ...data,
-                    avatar: data.avatar || TempProfilePic,
                     firstName: data.name?.split(' ')[0] || data.firstName || data.name,
                     lastName: data.name?.split(' ')[1] || data.lastName || '',
                     username: data.username || data.email?.split('@')[0],
@@ -44,7 +42,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
             const response = await fetch(`http://localhost:3001/api/users/friendship-status/${currentUser._id}/${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                setFriendshipStatus(data.status); // 'friends', 'request_sent', 'request_received', 'none'
+                setFriendshipStatus(data.status); 
             }
         } catch (error) {
             console.error('Error checking friendship status:', error);
@@ -181,7 +179,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                     {!canViewFullProfile && (
                         <div className="mb-6 p-4 bg-iron-light rounded-lg border border-ash-gray/30">
                             <p className="text-steel-light text-sm">
-                                🔒 Add {profileData.name?.split(' ')[0] || 'this user'} as a friend to view their full profile
+                                 Add {profileData.name?.split(' ')[0] || 'this user'} as a friend to view their full profile
                             </p>
                         </div>
                     )}
@@ -243,7 +241,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                                         onClick={handleSendFriendRequest}
                                         disabled={processingRequest}
                                     >
-                                        {processingRequest ? '⏳ Sending...' : '➕ Send Friend Request'}
+                                        {processingRequest ? '⏳ Sending...' : ' Send Friend Request'}
                                     </button>
                                 )}
 
@@ -253,7 +251,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                                         disabled
                                         className="px-8 py-4 rounded-xl font-semibold bg-ash-gray/20 text-ash-gray border border-ash-gray/30 cursor-not-allowed"
                                     >
-                                        📤 Friend Request Sent
+                                         Friend Request Sent
                                     </button>
                                 )}
 
@@ -263,7 +261,7 @@ const Profile = ({ userId, currentUser, isOwnProfile, onEdit }) => {
                                         className="px-8 py-4 rounded-xl font-semibold bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-white transition-all duration-300"
                                         onClick={() => window.location.href = '/home'}
                                     >
-                                        📥 Accept Friend Request
+                                         Accept Friend Request
                                     </button>
                                 )}
 

@@ -73,7 +73,7 @@ const ProjectPage = ({ currentUser }) => {
                     {activeTab === 'files' && (
                         <div>
                             <h3 className="text-2xl font-semibold text-forge-yellow mb-6">📁 Project Files</h3>
-                            <Files projectId={id} />
+                            <Files projectId={id} projectStatus={project?.status} />
                         </div>
                     )}
                     {activeTab === 'collaborators' && (

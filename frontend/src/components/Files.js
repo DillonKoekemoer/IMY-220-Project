@@ -2,17 +2,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { projectsAPI } from '../services/api';
 
-const Files = ({ projectId }) => {
+const Files = ({ projectId, projectStatus }) => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [sortBy, setSortBy] = useState('name');
     const [filterType, setFilterType] = useState('all');
+    const [currentProjectStatus, setCurrentProjectStatus] = useState(projectStatus || 'checked-in');
     const fileInputRef = useRef(null);
+
+    const isCheckedOut = currentProjectStatus === 'checked-out';
 
     useEffect(() => {
         fetchProject();
     }, [projectId]);
+
+    useEffect(() => {
+        setCurrentProjectStatus(projectStatus || 'checked-in');
+    }, [projectStatus]);
 
     const fetchProject = async () => {
         try {
@@ -20,6 +27,7 @@ const Files = ({ projectId }) => {
             if (!response.ok) throw new Error('Failed to fetch project');
             const data = await response.json();
             setFiles(data.files || []);
+            setCurrentProjectStatus(data.status || 'checked-in');
         } catch (error) {
             console.error('Error fetching project:', error);
         } finally {
@@ -124,12 +132,12 @@ const Files = ({ projectId }) => {
     };
 
     const getFileIcon = (mimetype) => {
-        if (mimetype?.startsWith('image/')) return '🖼️';
-        if (mimetype?.startsWith('text/')) return '📄';
-        if (mimetype?.includes('pdf')) return '📕';
-        if (mimetype?.includes('zip')) return '📦';
-        if (mimetype?.includes('javascript') || mimetype?.includes('json')) return '📜';
-        return '📎';
+        if (mimetype?.startsWith('image/')) return 'IMG';
+        if (mimetype?.startsWith('text/')) return 'TXT';
+        if (mimetype?.includes('pdf')) return 'PDF';
+        if (mimetype?.includes('zip')) return 'ZIP';
+        if (mimetype?.includes('javascript') || mimetype?.includes('json')) return 'JS';
+        return 'FILE';
     };
 
     const formatFileSize = (bytes) => {
@@ -221,17 +229,18 @@ const Files = ({ projectId }) => {
                 <div className="flex gap-3">
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
+                        disabled={uploading || !isCheckedOut}
                         className="px-4 py-2 rounded-lg text-white font-medium bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={!isCheckedOut ? 'Project must be checked out to upload files' : ''}
                     >
-                        {uploading ? '⏳ Uploading...' : '📤 Upload Materials'}
+                        {uploading ? 'Uploading...' : 'Upload Materials'}
                     </button>
                     {files.length > 0 && (
                         <button
                             onClick={handleDownloadAll}
                             className="px-4 py-2 rounded-lg font-medium bg-transparent text-forge-orange border-2 border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white hover:-translate-y-0.5 text-sm"
                         >
-                            📥 Download All
+                            Download All
                         </button>
                     )}
                 </div>
@@ -239,7 +248,6 @@ const Files = ({ projectId }) => {
 
             {processedFiles.length === 0 ? (
                 <div className="bg-iron-light rounded-xl p-12 text-center">
-                    <div className="text-6xl mb-4">📂</div>
                     <h4 className="text-xl font-semibold text-silver mb-2">No materials found</h4>
                     <p className="text-ash-gray mb-6">
                         {files.length === 0
@@ -248,11 +256,17 @@ const Files = ({ projectId }) => {
                     </p>
                     <button
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        className="px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50"
+                        disabled={uploading || !isCheckedOut}
+                        className="px-8 py-4 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={!isCheckedOut ? 'Project must be checked out to upload files' : ''}
                     >
-                        🚀 Add First Material
+                        Add First Material
                     </button>
+                    {!isCheckedOut && (
+                        <p className="text-ash-gray text-sm mt-4">
+                            Project is checked in. Check out the project to upload files.
+                        </p>
+                    )}
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -281,13 +295,15 @@ const Files = ({ projectId }) => {
                                     onClick={() => handleDownloadFile(file)}
                                     className="px-4 py-2 rounded-lg font-medium bg-transparent text-forge-orange border border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white text-sm"
                                 >
-                                    📥 Download
+                                    Download
                                 </button>
                                 <button
                                     onClick={() => handleDeleteFile(file.filename)}
-                                    className="px-4 py-2 rounded-lg font-medium bg-transparent text-red-400 border border-red-400 transition-all duration-300 hover:bg-red-500 hover:text-white text-sm"
+                                    disabled={!isCheckedOut}
+                                    className="px-4 py-2 rounded-lg font-medium bg-transparent text-red-400 border border-red-400 transition-all duration-300 hover:bg-red-500 hover:text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={!isCheckedOut ? 'Project must be checked out to delete files' : ''}
                                 >
-                                    🗑️ Delete
+                                    Delete
                                 </button>
                             </div>
                         </div>

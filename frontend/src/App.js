@@ -5,6 +5,7 @@ import SplashPage from './pages/SplashPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import ProjectPage from './pages/ProjectPage';
+import SearchResults from './pages/SearchResults';
 import Header from './components/Header';
 import './styles/tailwind.css';
 
@@ -161,8 +162,8 @@ const App = () => {
                     } 
                 />
 
-                <Route 
-                    path="/post/:id" 
+                <Route
+                    path="/post/:id"
                     element={
                         isAuthenticated ? (
                             <>
@@ -172,7 +173,21 @@ const App = () => {
                         ) : (
                             <Navigate to="/" replace />
                         )
-                    } 
+                    }
+                />
+
+                <Route
+                    path="/search"
+                    element={
+                        isAuthenticated ? (
+                            <>
+                                <Header currentUser={currentUser} onLogout={handleLogout} />
+                                <SearchResults currentUser={currentUser} />
+                            </>
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
+                    }
                 />
             </Routes>
         </div>

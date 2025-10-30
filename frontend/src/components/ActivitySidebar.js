@@ -21,10 +21,8 @@ const ActivitySidebar = ({ type, currentUser }) => {
                     data = await feedAPI.getLocal(currentUser._id);
                 }
                 
-                // Filter only posts for activity sidebar
                 const posts = data.filter(item => item.content);
                 
-                // Fetch user data
                 const userIds = [...new Set(posts.map(item => item.userId).filter(Boolean))];
                 const userMap = {};
                 
@@ -37,7 +35,7 @@ const ActivitySidebar = ({ type, currentUser }) => {
                 }
                 
                 setUsers(userMap);
-                setActivities(posts.slice(0, 5)); // Show only 5 recent activities
+                setActivities(posts.slice(0, 5)); 
             } catch (err) {
                 console.error('Failed to fetch activities:', err);
             } finally {

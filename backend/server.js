@@ -134,7 +134,8 @@ const authenticateToken = (req, res, next) => {
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             console.log('Token verification failed:', err.message);
-            return res.status(403).json({ error: 'Invalid or expired token' });
+            console.log('Error name:', err.name);
+            return res.status(403).json({ error: 'Invalid or expired token', details: err.message });
         }
         console.log('Authenticated user from token:', user);
         req.user = user;
@@ -169,7 +170,18 @@ app.post('/api/login', async (req, res) => {
         const userId = user._id.toString();
         const token = jwt.sign({ userId, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
         console.log('Login - Generated token for user:', { userId, email: user.email });
-        res.json({ token, user: { _id: userId, name: user.name, email: user.email } });
+        res.json({
+            token,
+            user: {
+                _id: userId,
+                name: user.name,
+                email: user.email,
+                profilePicture: user.profilePicture,
+                bio: user.bio,
+                location: user.location,
+                website: user.website
+            }
+        });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: error.message });
@@ -202,7 +214,18 @@ app.post('/api/register', async (req, res) => {
         console.log('New user created with ID:', userId);
         
         const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: '24h' });
-        res.status(201).json({ token, user: { _id: userId, name, email } });
+        res.status(201).json({
+            token,
+            user: {
+                _id: userId,
+                name,
+                email,
+                profilePicture: null,
+                bio: '',
+                location: '',
+                website: ''
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -396,16 +419,22 @@ app.post('/api/users/add-friend', async (req, res) => {
 app.delete('/api/friends/:userId/:friendId', async (req, res) => {
     try {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
-        
+
         const { userId, friendId } = req.params;
         console.log('Removing friend:', { userId, friendId });
-        
-        const result = await db.collection('Friends').deleteOne({ userId, friendId });
-        
+
+        // Delete friendship in both directions since it could be stored either way
+        const result = await db.collection('Friends').deleteOne({
+            $or: [
+                { userId, friendId, status: 'accepted' },
+                { userId: friendId, friendId: userId, status: 'accepted' }
+            ]
+        });
+
         if (result.deletedCount === 0) {
             return res.status(404).json({ error: 'Friendship not found' });
         }
-        
+
         console.log('Friend removed successfully');
         res.json({ message: 'Friend removed successfully' });
     } catch (error) {
@@ -641,6 +670,45 @@ app.post('/api/projects/:id/files', authenticateToken, uploadProjectFile.array('
         }
 
         const projectId = req.params.id;
+        const userId = req.user.userId;
+
+        // Check if project exists and get project details
+        const project = await db.collection('Projects').findOne({ _id: new ObjectId(projectId) });
+        if (!project) {
+            // Delete uploaded files if project not found
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // Check if user is owner or collaborator
+        const isOwner = project.userId === userId;
+        const isCollaborator = project.collaborators && project.collaborators.some(
+            collab => collab.userId === userId || collab === userId
+        );
+
+        if (!isOwner && !isCollaborator) {
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+            return res.status(403).json({ error: 'You must be a project member to upload files' });
+        }
+
+        if (project.status === 'checked-in') {
+            // Delete uploaded files
+            req.files.forEach(file => {
+                if (fs.existsSync(file.path)) {
+                    fs.unlinkSync(file.path);
+                }
+            });
+            return res.status(403).json({ error: 'Project must be checked out to upload files' });
+        }
+
         const files = req.files.map(file => ({
             filename: file.filename,
             originalName: file.originalname,
@@ -655,16 +723,6 @@ app.post('/api/projects/:id/files', authenticateToken, uploadProjectFile.array('
             { _id: new ObjectId(projectId) },
             { $push: { files: { $each: files } } }
         );
-
-        if (result.matchedCount === 0) {
-            // Delete uploaded files if project not found
-            req.files.forEach(file => {
-                if (fs.existsSync(file.path)) {
-                    fs.unlinkSync(file.path);
-                }
-            });
-            return res.status(404).json({ error: 'Project not found' });
-        }
 
         res.json({
             message: 'Files uploaded successfully',
@@ -691,10 +749,25 @@ app.delete('/api/projects/:id/files/:fileId', authenticateToken, async (req, res
 
         const projectId = req.params.id;
         const fileId = req.params.fileId;
+        const userId = req.user.userId;
 
         const project = await db.collection('Projects').findOne({ _id: new ObjectId(projectId) });
         if (!project) {
             return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // Check if user is owner or collaborator
+        const isOwner = project.userId === userId;
+        const isCollaborator = project.collaborators && project.collaborators.some(
+            collab => collab.userId === userId || collab === userId
+        );
+
+        if (!isOwner && !isCollaborator) {
+            return res.status(403).json({ error: 'You must be a project member to delete files' });
+        }
+
+        if (project.status === 'checked-in') {
+            return res.status(403).json({ error: 'Project must be checked out to delete files' });
         }
 
         const file = project.files?.find(f => f._id?.toString() === fileId || f.filename === fileId);
@@ -723,23 +796,39 @@ app.patch('/api/projects/:id/status', authenticateToken, async (req, res) => {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
 
         const { status } = req.body;
+        const userId = req.user.userId;
+        const projectId = req.params.id;
+
         if (!['checked-in', 'checked-out'].includes(status)) {
             return res.status(400).json({ error: 'Invalid status. Must be "checked-in" or "checked-out"' });
         }
 
+        // Get project to check permissions
+        const project = await db.collection('Projects').findOne({ _id: new ObjectId(projectId) });
+        if (!project) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // Check if user is owner or collaborator
+        const isOwner = project.userId === userId;
+        const isCollaborator = project.collaborators && project.collaborators.some(
+            collab => collab.userId === userId || collab === userId
+        );
+
+        if (!isOwner && !isCollaborator) {
+            return res.status(403).json({ error: 'You must be a project member to change status' });
+        }
+
         const result = await db.collection('Projects').updateOne(
-            { _id: new ObjectId(req.params.id) },
+            { _id: new ObjectId(projectId) },
             {
                 $set: {
                     status: status,
-                    lastStatusChange: new Date().toISOString()
+                    lastStatusChange: new Date().toISOString(),
+                    lastStatusChangedBy: userId
                 }
             }
         );
-
-        if (result.matchedCount === 0) {
-            return res.status(404).json({ error: 'Project not found' });
-        }
 
         res.json({ message: 'Project status updated', status });
     } catch (error) {
@@ -941,11 +1030,24 @@ app.get('/api/friends/:userId', async (req, res) => {
         if (!db) return res.status(500).json({ error: 'Database not connected' });
 
         const userId = req.params.userId;
+
+        // Find friends in both directions (where user is either userId or friendId)
         const friends = await db.collection('Friends')
-            .find({ userId, status: 'accepted' })
+            .find({
+                $or: [
+                    { userId, status: 'accepted' },
+                    { friendId: userId, status: 'accepted' }
+                ]
+            })
             .toArray();
 
-        res.json(friends);
+        // Map to always return the OTHER person's ID as friendId
+        const normalizedFriends = friends.map(friend => ({
+            ...friend,
+            friendId: friend.userId === userId ? friend.friendId : friend.userId
+        }));
+
+        res.json(normalizedFriends);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -1147,6 +1249,161 @@ app.post('/api/users/reject-friend-request', async (req, res) => {
         res.json({ message: 'Friend request rejected' });
     } catch (error) {
         console.error('Reject friend request error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Search endpoint with fuzzy matching and autocomplete
+app.get('/api/search', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { q, type } = req.query; // q = query, type = 'users' | 'projects' | 'all'
+
+        if (!q || q.trim().length === 0) {
+            return res.json({ users: [], projects: [], hashtags: [] });
+        }
+
+        const searchTerm = q.trim();
+        const searchRegex = new RegExp(searchTerm.split('').join('.*'), 'i'); // Fuzzy regex
+        const results = { users: [], projects: [], hashtags: [] };
+
+        // Search users
+        if (type === 'users' || type === 'all' || !type) {
+            const users = await db.collection('Users')
+                .find({
+                    $or: [
+                        { name: searchRegex },
+                        { email: searchRegex },
+                        { firstName: searchRegex },
+                        { lastName: searchRegex },
+                        { bio: searchRegex }
+                    ]
+                })
+                .limit(10)
+                .toArray();
+
+            results.users = users.map(user => ({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                profilePicture: user.profilePicture,
+                bio: user.bio
+            }));
+        }
+
+        // Search projects
+        if (type === 'projects' || type === 'all' || !type) {
+            const projects = await db.collection('Projects')
+                .find({
+                    $or: [
+                        { name: searchRegex },
+                        { description: searchRegex },
+                        { languages: searchRegex },
+                        { hashtags: searchRegex }
+                    ]
+                })
+                .limit(10)
+                .toArray();
+
+            results.projects = projects;
+        }
+
+        // Extract hashtags from search term
+        if (searchTerm.startsWith('#')) {
+            const hashtagSearch = searchTerm.substring(1);
+            const hashtagRegex = new RegExp(hashtagSearch, 'i');
+
+            const projectsWithHashtag = await db.collection('Projects')
+                .find({ hashtags: hashtagRegex })
+                .limit(10)
+                .toArray();
+
+            results.hashtags = projectsWithHashtag;
+        }
+
+        res.json(results);
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Autocomplete endpoint for suggestions
+app.get('/api/search/autocomplete', async (req, res) => {
+    try {
+        if (!db) return res.status(500).json({ error: 'Database not connected' });
+
+        const { q } = req.query;
+
+        if (!q || q.trim().length < 2) {
+            return res.json({ suggestions: [] });
+        }
+
+        const searchTerm = q.trim();
+        const searchRegex = new RegExp('^' + searchTerm.split('').join('.*'), 'i');
+        const suggestions = [];
+
+        // Get user name suggestions
+        const users = await db.collection('Users')
+            .find({ name: searchRegex })
+            .limit(5)
+            .toArray();
+
+        users.forEach(user => {
+            suggestions.push({
+                type: 'user',
+                text: user.name,
+                id: user._id,
+                subtitle: user.email
+            });
+        });
+
+        // Get project name suggestions
+        const projects = await db.collection('Projects')
+            .find({ name: searchRegex })
+            .limit(5)
+            .toArray();
+
+        projects.forEach(project => {
+            suggestions.push({
+                type: 'project',
+                text: project.name,
+                id: project._id,
+                subtitle: project.description?.substring(0, 50)
+            });
+        });
+
+        // Get hashtag suggestions
+        if (searchTerm.startsWith('#')) {
+            const hashtagSearch = searchTerm.substring(1);
+            const allProjects = await db.collection('Projects')
+                .find({ hashtags: { $exists: true } })
+                .toArray();
+
+            const hashtagSet = new Set();
+            allProjects.forEach(project => {
+                if (project.hashtags && Array.isArray(project.hashtags)) {
+                    project.hashtags.forEach(tag => {
+                        if (tag.toLowerCase().startsWith(hashtagSearch.toLowerCase())) {
+                            hashtagSet.add(tag);
+                        }
+                    });
+                }
+            });
+
+            Array.from(hashtagSet).slice(0, 5).forEach(tag => {
+                suggestions.push({
+                    type: 'hashtag',
+                    text: `#${tag}`,
+                    subtitle: 'Hashtag'
+                });
+            });
+        }
+
+        res.json({ suggestions: suggestions.slice(0, 10) });
+    } catch (error) {
+        console.error('Autocomplete error:', error);
         res.status(500).json({ error: error.message });
     }
 });

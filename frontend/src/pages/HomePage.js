@@ -8,7 +8,6 @@ import SearchInput from '../components/SearchInput';
 const HomePage = ({ currentUser }) => {
     const [feedType, setFeedType] = useState('local');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortBy, setSortBy] = useState('name'); 
     const [selectedLanguage, setSelectedLanguage] = useState('all'); 
 
     const availableLanguages = [
@@ -38,20 +37,20 @@ const HomePage = ({ currentUser }) => {
                     </div>
                     <div className="flex justify-between items-center mb-8 flex-wrap gap-6">
                         <div className="flex gap-2 bg-iron-light p-1 rounded-lg border border-ash-gray">
-                            <button 
+                            <button
                                 className={`px-4 py-2 rounded-lg border-none bg-transparent cursor-pointer text-sm font-medium transition-all duration-300 whitespace-nowrap ${
-                                    feedType === 'local' 
-                                        ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1' 
+                                    feedType === 'local'
+                                        ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1'
                                         : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
                                 }`}
                                 onClick={() => setFeedType('local')}
                             >
                                 My Feed
                             </button>
-                            <button 
+                            <button
                                 className={`px-4 py-2 rounded-lg border-none bg-transparent cursor-pointer text-sm font-medium transition-all duration-300 whitespace-nowrap ${
-                                    feedType === 'global' 
-                                        ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1' 
+                                    feedType === 'global'
+                                        ? 'bg-gradient-fire text-white shadow-forge transform -translate-y-1'
                                         : 'text-ash-gray hover:bg-iron-light hover:text-forge-orange'
                                 }`}
                                 onClick={() => setFeedType('global')}
@@ -59,42 +58,26 @@ const HomePage = ({ currentUser }) => {
                                 Global Feed
                             </button>
                         </div>
-                        <div className="flex gap-6 flex-wrap">
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="sort-select" className="text-sm font-medium text-silver">Sort by:</label>
-                                <select
-                                    id="sort-select"
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="px-4 py-2 border border-ash-gray rounded-lg text-sm bg-iron-light text-silver min-h-[36px] cursor-pointer focus:border-forge-orange focus:outline-none focus:ring-2 focus:ring-forge-orange/20"
-                                >
-                                    <option value="name">Name</option>
-                                    <option value="version">Version</option>
-                                    <option value="status">Status</option>
-                                </select>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="language-select" className="text-sm font-medium text-silver">Filter by Language:</label>
-                                <select
-                                    id="language-select"
-                                    value={selectedLanguage}
-                                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                                    className="px-4 py-2 border border-ash-gray rounded-lg text-sm bg-iron-light text-silver min-h-[36px] cursor-pointer focus:border-forge-orange focus:outline-none focus:ring-2 focus:ring-forge-orange/20"
-                                >
-                                    {availableLanguages.map((language) => (
-                                        <option key={language} value={language}>
-                                            {language === 'all' ? 'All Languages' : language}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="language-select" className="text-sm font-medium text-silver">Filter by Language:</label>
+                            <select
+                                id="language-select"
+                                value={selectedLanguage}
+                                onChange={(e) => setSelectedLanguage(e.target.value)}
+                                className="px-4 py-2 border border-ash-gray rounded-lg text-sm bg-iron-light text-silver min-h-[36px] cursor-pointer focus:border-forge-orange focus:outline-none focus:ring-2 focus:ring-forge-orange/20"
+                            >
+                                {availableLanguages.map((language) => (
+                                    <option key={language} value={language}>
+                                        {language === 'all' ? 'All Languages' : language}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
-                    <ProjectFeed 
-                        type={feedType} 
-                        currentUser={currentUser} 
+                    <ProjectFeed
+                        type={feedType}
+                        currentUser={currentUser}
                         searchTerm={searchTerm}
-                        sortBy={sortBy}
                         selectedLanguage={selectedLanguage}
                     />
                 </div>

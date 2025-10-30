@@ -89,7 +89,6 @@ const Messages = ({ projectId }) => {
                 })
             ) : (
                 <div className="text-center py-12 text-ash-gray">
-                    <div className="text-4xl mb-4">💬</div>
                     <p className="text-lg">No activity yet</p>
                     <p className="text-sm">Project updates will appear here</p>
                 </div>

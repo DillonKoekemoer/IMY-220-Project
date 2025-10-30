@@ -30,7 +30,7 @@ const CreatePost = ({ currentUser, projectId, onPostCreated }) => {
 
     return (
         <div className="bg-iron-light rounded-xl p-6 border-2 border-steel-blue">
-            <h4 className="text-lg font-semibold text-forge-yellow mb-4">💬 Share an Update</h4>
+            <h4 className="text-lg font-semibold text-forge-yellow mb-4"> Share an Update</h4>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <textarea
@@ -47,7 +47,7 @@ const CreatePost = ({ currentUser, projectId, onPostCreated }) => {
                     className="px-6 py-3 rounded-xl text-white font-semibold bg-gradient-fire shadow-forge transition-all duration-300 hover:shadow-forge-hover hover:-translate-y-1 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     disabled={!content.trim() || isSubmitting}
                 >
-                    {isSubmitting ? '⏳ Posting...' : '🚀 Post Update'}
+                    {isSubmitting ? '⏳ Posting...' : ' Post Update'}
                 </button>
             </form>
         </div>

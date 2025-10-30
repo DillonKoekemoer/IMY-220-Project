@@ -5,7 +5,7 @@ import { usersAPI } from '../services/api';
 import Profile from '../components/Profile';
 import EditProfile from '../components/EditProfile';
 import ProjectList from '../components/ProjectList';
-import FriendsList from '../components/FriendsList';
+import FriendsSection from '../components/FriendsSection';
 import CreateProject from '../components/CreateProject';
 import UserActivity from '../components/UserActivity';
 
@@ -179,7 +179,7 @@ const ProfilePage = ({ profileId, currentUser, onLogout, onUserUpdate }) => {
 
                         {activeTab === 'friends' && (
                             <div>
-                                <FriendsList userId={id} />
+                                <FriendsSection userId={id} currentUser={currentUser} />
                             </div>
                         )}
 

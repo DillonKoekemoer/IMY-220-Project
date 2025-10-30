@@ -50,7 +50,12 @@ const LoginForm = ({ onLogin }) => {
             const data = await response.json();
 
             if (response.ok) {
-                onLogin(data.user);
+                // Save token to localStorage
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    console.log('Token saved to localStorage');
+                }
+                onLogin(data);
                 setErrors({});
             } else {
                 setErrors({ submit: data.error || 'Login failed' });

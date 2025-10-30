@@ -52,7 +52,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
             const response = await fetch(`http://localhost:3001/api/users/friendship-status/${currentUser._id}/${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                return data.status; // 'friends', 'request_sent', 'request_received', 'none'
+                return data.status; 
             }
         } catch (error) {
             console.error('Error checking friend status:', error);
@@ -108,10 +108,8 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
     const handleViewProfile = (userId) => {
         const friendStatus = friendStatuses[userId];
         if (friendStatus === 'friends') {
-            // Friends can view full profile
             navigate(`/profile/${userId}`);
         } else {
-            // Non-friends can only see basic info (already displayed in card)
             alert('Add this user as a friend to view their full profile!');
         }
     };
@@ -189,7 +187,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
 
             alert('Ownership transferred successfully! This user is now the project owner.');
             await fetchCollaborators();
-            window.location.reload(); // Reload to update isOwner status
+            window.location.reload(); 
         } catch (error) {
             console.error('Error transferring ownership:', error);
             alert(error.message || 'Failed to transfer ownership. Please try again.');
@@ -305,7 +303,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                         className="px-4 py-2 rounded-lg font-medium bg-forge-yellow/20 text-forge-yellow border border-forge-yellow/30 hover:bg-forge-yellow hover:text-iron-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                                         title="Transfer ownership to this user"
                                                     >
-                                                        {processingAction[collaborator._id] === 'promoting' ? '⏳' : '👑 Make Owner'}
+                                                        {processingAction[collaborator._id] === 'promoting' ? '⏳' : 'Make Owner'}
                                                     </button>
                                                     <button
                                                         onClick={() => handleRemoveCollaborator(collaborator._id)}
@@ -313,7 +311,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                         className="px-4 py-2 rounded-lg font-medium bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                                         title="Remove from project"
                                                     >
-                                                        {processingAction[collaborator._id] === 'removing' ? '⏳' : '🗑️ Remove'}
+                                                        {processingAction[collaborator._id] === 'removing' ? '⏳' : ' Remove'}
                                                     </button>
                                                 </>
                                             )}
@@ -328,7 +326,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                             : 'bg-steel-blue/20 text-steel-light border border-steel-blue/30 hover:bg-steel-blue hover:text-white'
                                                     }`}
                                                 >
-                                                    {isFriend ? '👤 View Profile' : '👁️ View'}
+                                                    {isFriend ? ' View Profile' : ' View'}
                                                 </button>
                                             )}
 
@@ -339,7 +337,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                     disabled={processingFriend[collaborator._id]}
                                                     className="px-4 py-2 rounded-lg font-medium bg-gradient-fire text-white border border-forge-orange transition-all duration-300 hover:shadow-forge-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                                 >
-                                                    {processingFriend[collaborator._id] ? '⏳' : '➕ Add Friend'}
+                                                    {processingFriend[collaborator._id] ? '⏳' : ' Add Friend'}
                                                 </button>
                                             )}
 
@@ -348,7 +346,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                     disabled
                                                     className="px-4 py-2 rounded-lg font-medium bg-ash-gray/20 text-ash-gray border border-ash-gray/30 cursor-not-allowed text-sm"
                                                 >
-                                                    📤 Request Sent
+                                                     Request Sent
                                                 </button>
                                             )}
 
@@ -357,7 +355,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                     onClick={() => navigate('/home')}
                                                     className="px-4 py-2 rounded-lg font-medium bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500 hover:text-white transition-all duration-300 text-sm"
                                                 >
-                                                    📥 Accept Request
+                                                    Accept Request
                                                 </button>
                                             )}
 
@@ -367,7 +365,7 @@ const Collaborators = ({ projectId, currentUser, isOwner }) => {
                                                     disabled={processingFriend[collaborator._id]}
                                                     className="px-4 py-2 rounded-lg font-medium bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                                 >
-                                                    {processingFriend[collaborator._id] ? '⏳' : '❌ Unfriend'}
+                                                    {processingFriend[collaborator._id] ? '⏳' : 'X Unfriend'}
                                                 </button>
                                             )}
                                         </div>

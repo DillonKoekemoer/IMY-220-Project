@@ -69,20 +69,34 @@ const ProjectList = ({ userId, isOwnProfile }) => {
 
   const currentProjects = activeSection === 'created' ? createdProjects : savedProjects;
 
+  // Calculate status counts for created projects
+  const checkedOutCount = createdProjects.filter(p => p.status === 'checked-out').length;
+  const checkedInCount = createdProjects.filter(p => p.status === 'checked-in').length;
+
   return (
     <section>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h3 className="text-2xl font-semibold text-forge-yellow">{isOwnProfile ? 'My Projects' : 'Projects'}</h3>
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <div className="text-center">
             <div className="text-2xl font-bold text-forge-orange">{createdProjects.length}</div>
             <div className="text-xs text-ash-gray uppercase tracking-wide">Created</div>
           </div>
           {isOwnProfile && (
-            <div className="text-center">
-              <div className="text-2xl font-bold text-forge-yellow">{savedProjects.length}</div>
-              <div className="text-xs text-ash-gray uppercase tracking-wide">Saved</div>
-            </div>
+            <>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-forge-yellow">{savedProjects.length}</div>
+                <div className="text-xs text-ash-gray uppercase tracking-wide">Saved</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">{checkedOutCount}</div>
+                <div className="text-xs text-ash-gray uppercase tracking-wide">Checked Out</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-400">{checkedInCount}</div>
+                <div className="text-xs text-ash-gray uppercase tracking-wide">Checked In</div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -98,7 +112,7 @@ const ProjectList = ({ userId, isOwnProfile }) => {
                 : 'bg-iron-light text-ash-gray border border-steel-blue hover:border-forge-orange hover:text-forge-orange'
             }`}
           >
-            📦 Created Projects ({createdProjects.length})
+             Created Projects ({createdProjects.length})
           </button>
           <button
             onClick={() => setActiveSection('saved')}
@@ -108,7 +122,7 @@ const ProjectList = ({ userId, isOwnProfile }) => {
                 : 'bg-iron-light text-ash-gray border border-steel-blue hover:border-forge-orange hover:text-forge-orange'
             }`}
           >
-            💾 Saved Projects ({savedProjects.length})
+             Saved Projects ({savedProjects.length})
           </button>
         </div>
       )}

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usersAPI, projectsAPI } from '../services/api';
+import { renderTextWithHashtags, renderHashtagBadges } from '../utils/hashtagUtils';
 
 const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
   const [error, setError] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [togglingStatus, setTogglingStatus] = useState(false);
+
+  const handleHashtagClick = (hashtag) => {
+    navigate(`/search?q=${encodeURIComponent(hashtag)}`);
+  };
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -49,10 +55,14 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
   if (!project) return <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-steel-blue text-center"><div className="text-ash-gray">Project not found</div></div>;
 
   const isOwner = currentUser?._id === project.userId;
+  const isCollaborator = project.collaborators && project.collaborators.some(
+    collab => collab.userId === currentUser?._id || collab === currentUser?._id
+  );
+  const isMember = isOwner || isCollaborator;
 
   const handleDelete = async () => {
     if (!isOwner || deleting) return;
-    
+
     setDeleting(true);
     try {
       await projectsAPI.delete(projectId);
@@ -66,6 +76,38 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
     }
   };
 
+  const handleToggleStatus = async () => {
+    if (!isMember || togglingStatus) return;
+
+    const newStatus = project.status === 'checked-in' ? 'checked-out' : 'checked-in';
+    setTogglingStatus(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3001/api/projects/${projectId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update project status');
+      }
+
+      // Update local state
+      setProject({ ...project, status: newStatus });
+      if (onProjectLoad) onProjectLoad({ ...project, status: newStatus });
+    } catch (error) {
+      console.error('Toggle status error:', error);
+      alert('Failed to update project status. Please try again.');
+    } finally {
+      setTogglingStatus(false);
+    }
+  };
+
   return (
     <div className="bg-gradient-steel text-silver rounded-xl p-8 shadow-forge border-2 border-forge-orange relative overflow-hidden">
       {/* Top accent bar */}
@@ -75,17 +117,40 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
         {/* Main Project Info */}
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-            <div>
+            <div className="flex-1">
               <h2 className="text-3xl lg:text-4xl font-sans font-bold text-forge-yellow mb-2">{project.name}</h2>
-              <div className="text-forge-orange font-semibold text-sm">
-                Version {project.version}
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="text-forge-orange font-semibold text-sm">
+                  Version {project.version}
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold border-2 ${
+                    project.status === 'checked-out'
+                      ? 'bg-green-500/20 text-green-400 border-green-500/50'
+                      : 'bg-red-500/20 text-red-400 border-red-500/50'
+                  }`}
+                >
+                  {project.status === 'checked-out' ? 'Checked Out' : 'Checked In'}
+                </span>
               </div>
             </div>
           </div>
 
           <div className="mb-8">
-            <p className="text-ash-gray text-lg leading-relaxed">{project.description}</p>
+            <p className="text-ash-gray text-lg leading-relaxed">
+              {renderTextWithHashtags(project.description, handleHashtagClick)}
+            </p>
           </div>
+
+          {/* Hashtags section */}
+          {project.hashtags && project.hashtags.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-forge-yellow mb-3">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {renderHashtagBadges(project.hashtags, handleHashtagClick)}
+              </div>
+            </div>
+          )}
 
           {/* Project Metadata */}
           <div className="bg-iron-light rounded-xl p-6 mb-6">
@@ -138,28 +203,45 @@ const Project = ({ projectId, currentUser, onEdit, onProjectLoad }) => {
         <div className="lg:w-64 flex-shrink-0">
           <div className="bg-iron-light rounded-xl p-6 space-y-4">
             <h3 className="text-lg font-semibold text-forge-yellow mb-4">Actions</h3>
+            {isMember && (
+              <button
+                onClick={handleToggleStatus}
+                disabled={togglingStatus}
+                className={`w-full px-6 py-3 rounded-xl font-semibold border-2 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  project.status === 'checked-out'
+                    ? 'bg-red-500/10 text-red-400 border-red-500 hover:bg-red-500 hover:text-white'
+                    : 'bg-green-500/10 text-green-400 border-green-500 hover:bg-green-500 hover:text-white'
+                }`}
+              >
+                {togglingStatus
+                  ? 'Updating...'
+                  : project.status === 'checked-out'
+                  ? 'Check In'
+                  : 'Check Out'}
+              </button>
+            )}
             {isOwner && (
               <>
-                <button 
+                <button
                   className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-forge-orange border-2 border-forge-orange transition-all duration-300 hover:bg-forge-orange hover:text-white hover:-translate-y-0.5"
                   onClick={onEdit}
                 >
-Edit Project
+                  Edit Project
                 </button>
-                <button 
+                <button
                   className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-red-400 border-2 border-red-400 transition-all duration-300 hover:bg-red-500 hover:text-white hover:-translate-y-0.5"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
-Delete Project
+                  Delete Project
                 </button>
               </>
             )}
             {projectAuthor?._id && (
-              <button 
+              <button
                 className="w-full px-6 py-3 rounded-xl font-semibold bg-transparent text-ash-gray border border-ash-gray transition-all duration-300 hover:bg-iron-light hover:border-forge-orange hover:text-forge-orange"
                 onClick={() => navigate(`/profile/${projectAuthor._id}`)}
               >
-View Author
+                View Author
               </button>
             )}
           </div>
