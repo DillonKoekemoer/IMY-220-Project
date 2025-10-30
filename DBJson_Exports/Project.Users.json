@@ -1,0 +1,133 @@
+[{
+  "_id": {
+    "$oid": "68dcce428eace99203163b13"
+  },
+  "name": "Josh Roberts",
+  "email": "joshRob@gmail.com",
+  "password": "$2b$10$3fyp4htQGgtxecx3DOlRNOKF28r99PxGhLsH4263Iyi3RbjQAZ15.",
+  "bio": "I love apex legends ",
+  "firstName": "Joshua",
+  "lastName": "Roberts",
+  "location": "Salt Rock",
+  "website": "https://github.com/JoshuaRoberts"
+},
+{
+  "_id": {
+    "$oid": "68dcdf9d638f087737d8b9db"
+  },
+  "name": "Dillon Koekemoer",
+  "email": "dillon.koek2@gmail.com",
+  "password": "$2b$10$EJG/ufwpef2GCWbLK4U7.uAvPsd.Wbics0ob/0hljxmpXULHGVG5C",
+  "firstName": "Dillon",
+  "lastName": "Koekemoer",
+  "bio": "I like food alot and i mean alot",
+  "location": "Night City",
+  "website": "https://github.com/DillonKoekemoer",
+  "profilePicture": "/uploads/profile-pictures/profile-1761741553797-188592659.jpg"
+},
+{
+  "_id": {
+    "$oid": "68dce95168cb41b1d9b8ef43"
+  },
+  "name": "Dylan McRobbie",
+  "email": "DylanMc@gmail.com",
+  "password": "$2b$10$ZWOQv/KBRzAITe79Xf06VepHM5ICmTkhntKdcqCqu7dbhOH7JB7lS",
+  "firstName": "Dylan",
+  "lastName": "McRobbie",
+  "bio": "blah blah blah csgo",
+  "location": "china",
+  "website": ""
+},
+{
+  "_id": {
+    "$oid": "68dceaa45e11553ff5a33b2e"
+  },
+  "name": "Noah Dollen",
+  "email": "NJD@gmail.com",
+  "password": "$2b$10$x.4F1TMqYDP1QvPPNn8N5.ODqgd3q9ZoILSuGUyab3/efSkN4hlFW",
+  "firstName": "Noah",
+  "lastName": "Dollen",
+  "bio": "I like cameras",
+  "location": "Gauteng",
+  "website": ""
+},
+{
+  "_id": {
+    "$oid": "68dcf05efd226d71d33c4dc9"
+  },
+  "name": "David Potgieter",
+  "email": "davidp@gmail.com",
+  "password": "$2b$10$h7WXKAX9GVUR7cGVJzcnIujjIQsoN.wzSSVQWOuAYCgC68wE9nrMm",
+  "firstName": "David",
+  "lastName": "Potgieter",
+  "bio": "I have no life and only play rust",
+  "location": "Silverlakes",
+  "website": "https://github.com/DavidPotgieter"
+},
+{
+  "_id": {
+    "$oid": "68dcf383fd226d71d33c4dd1"
+  },
+  "name": "eddie lee",
+  "email": "eddie06612@gmail.com",
+  "password": "$2b$10$uX2DE.jVFLmOS.4dPz6bi.xds9FAW/mhp.AirpTcFu3/HIJ9OacOq",
+  "firstName": "eddie",
+  "lastName": "lee",
+  "bio": "",
+  "location": "",
+  "website": ""
+},
+{
+  "_id": {
+    "$oid": "68de2d62a160937361232d69"
+  },
+  "name": "Test User",
+  "email": "test@gmail.com",
+  "password": "$2b$10$MQWxIcE.xZGlHrWoIJlgK.5f2t7fRP4ouRsNiEih.v5W3aVv9esP6",
+  "firstName": "Test",
+  "lastName": "User",
+  "bio": "This is a test profile to be used in a demo",
+  "location": "test city, the moon",
+  "website": ""
+},
+{
+  "_id": {
+    "$oid": "6903807612833c8f67adc37d"
+  },
+  "name": "Lyle Cornick",
+  "email": "Lyle@gmail.com",
+  "password": "$2b$10$9W.VMD5BKIr4aBrTVnXZWO1Zhw4IBfqZR/aG6Izl0ckfust7SW4xe",
+  "firstName": "Lyle",
+  "lastName": "Cornick",
+  "bio": "I may be small but i can code well",
+  "location": "",
+  "website": "",
+  "profilePicture": "/uploads/profile-pictures/profile-1761837189802-981581487.jpg"
+},
+{
+  "_id": {
+    "$oid": "69038406e0ceccfd34b951bd"
+  },
+  "name": "Jason Derulo",
+  "email": "Jason@gmail.com",
+  "password": "$2b$10$IKzRgrlgxxarZ471vcGa2.Y/Wr0IGgMmA9tacVvoXqRrLgH4822mG",
+  "firstName": "Jason",
+  "lastName": "Derulo",
+  "bio": "",
+  "location": "",
+  "website": "",
+  "profilePicture": "/uploads/profile-pictures/profile-1761838135038-947919696.jpg"
+},
+{
+  "_id": {
+    "$oid": "6903847fe0ceccfd34b951bf"
+  },
+  "name": "Michael Tarr",
+  "email": "mtarr@gmail.com",
+  "password": "$2b$10$Q7Ef6qMEyA5UaQUuH2vk0.RVSuOLljAyydAgOl7lAo6NLibnfkxje",
+  "firstName": "Michael",
+  "lastName": "Tarr",
+  "bio": "",
+  "location": "",
+  "website": ""
+}]
